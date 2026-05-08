@@ -1,0 +1,11 @@
+﻿.godot/
+*.uid
+.mono/
+data_*/
+mono_crash.*.json
+export/
+*.apk
+*.aab
+*.exe
+.DS_Store
+Thumbs.db

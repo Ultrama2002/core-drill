@@ -1,0 +1,127 @@
+[
+  {
+    "name": "Topsoil",
+    "min_depth": 0,
+    "bg_color": [0.55, 0.35, 0.15, 1],
+    "drops": [
+      { "material": "scrap",   "weight": 75 },
+      { "material": "coal",    "weight": 20 },
+      { "material": "copper",  "weight": 4  },
+      { "material": "iron",    "weight": 1  }
+    ]
+  },
+  {
+    "name": "Clay",
+    "min_depth": 1200,
+    "bg_color": [0.70, 0.50, 0.25, 1],
+    "drops": [
+      { "material": "scrap",   "weight": 45 },
+      { "material": "coal",    "weight": 35 },
+      { "material": "copper",  "weight": 15 },
+      { "material": "iron",    "weight": 4  },
+      { "material": "silver",  "weight": 1  }
+    ]
+  },
+  {
+    "name": "Sandstone",
+    "min_depth": 6000,
+    "bg_color": [0.85, 0.75, 0.45, 1],
+    "drops": [
+      { "material": "coal",    "weight": 40 },
+      { "material": "copper",  "weight": 35 },
+      { "material": "iron",    "weight": 18 },
+      { "material": "silver",  "weight": 5  },
+      { "material": "gold",    "weight": 2  }
+    ]
+  },
+  {
+    "name": "Limestone",
+    "min_depth": 25000,
+    "bg_color": [0.75, 0.75, 0.70, 1],
+    "drops": [
+      { "material": "copper",  "weight": 30 },
+      { "material": "iron",    "weight": 35 },
+      { "material": "silver",  "weight": 20 },
+      { "material": "gold",    "weight": 10 },
+      { "material": "ruby",    "weight": 4  },
+      { "material": "diamond", "weight": 1  }
+    ]
+  },
+  {
+    "name": "Granite",
+    "min_depth": 100000,
+    "bg_color": [0.55, 0.50, 0.50, 1],
+    "drops": [
+      { "material": "iron",     "weight": 30 },
+      { "material": "silver",   "weight": 25 },
+      { "material": "gold",     "weight": 25 },
+      { "material": "ruby",     "weight": 12 },
+      { "material": "diamond",  "weight": 7  },
+      { "material": "obsidian", "weight": 1  }
+    ]
+  },
+  {
+    "name": "Basalt",
+    "min_depth": 400000,
+    "bg_color": [0.25, 0.25, 0.30, 1],
+    "drops": [
+      { "material": "silver",   "weight": 20 },
+      { "material": "gold",     "weight": 25 },
+      { "material": "ruby",     "weight": 20 },
+      { "material": "diamond",  "weight": 20 },
+      { "material": "obsidian", "weight": 12 },
+      { "material": "titanium", "weight": 3  }
+    ]
+  },
+  {
+    "name": "Mantle",
+    "min_depth": 1500000,
+    "bg_color": [0.80, 0.30, 0.10, 1],
+    "drops": [
+      { "material": "gold",     "weight": 15 },
+      { "material": "ruby",     "weight": 20 },
+      { "material": "diamond",  "weight": 20 },
+      { "material": "obsidian", "weight": 20 },
+      { "material": "titanium", "weight": 20 },
+      { "material": "plasma",   "weight": 5  }
+    ]
+  },
+  {
+    "name": "Outer Core",
+    "min_depth": 10000000,
+    "bg_color": [0.95, 0.55, 0.05, 1],
+    "drops": [
+      { "material": "diamond",  "weight": 15 },
+      { "material": "obsidian", "weight": 20 },
+      { "material": "titanium", "weight": 30 },
+      { "material": "plasma",   "weight": 35 }
+    ]
+  },
+  {
+    "name": "Inner Core",
+    "min_depth": 50000000,
+    "bg_color": [1.00, 0.85, 0.10, 1],
+    "drops": [
+      { "material": "obsidian", "weight": 10 },
+      { "material": "titanium", "weight": 25 },
+      { "material": "plasma",   "weight": 65 }
+    ]
+  },
+  {
+    "name": "Dimension I",
+    "min_depth": 250000000,
+    "bg_color": [0.30, 0.10, 0.60, 1],
+    "drops": [
+      { "material": "titanium", "weight": 20 },
+      { "material": "plasma",   "weight": 80 }
+    ]
+  },
+  {
+    "name": "Dimension II",
+    "min_depth": 2500000000,
+    "bg_color": [0.05, 0.40, 0.80, 1],
+    "drops": [
+      { "material": "plasma", "weight": 100 }
+    ]
+  }
+]

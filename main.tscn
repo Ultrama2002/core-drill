@@ -1,0 +1,179 @@
+[gd_scene format=3 uid="uid://cosjs520d8koa"]
+
+[ext_resource type="Script" uid="uid://bbsk3uwjj6gvh" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://ckcb1p1esdtjo" path="res://world_view.gd" id="2_worldview"]
+[ext_resource type="Script" uid="uid://bgpebcyaiqqyp" path="res://drill_char.gd" id="3_drillchar"]
+[ext_resource type="Script" uid="uid://dmehfuw7wr68l" path="res://depth_ruler.gd" id="4_depthruler"]
+
+[node name="Main" type="Node2D" unique_id=473836287]
+script = ExtResource("1_ig7tw")
+
+[node name="WorldView" type="Node2D" parent="." unique_id=100000001]
+script = ExtResource("2_worldview")
+
+[node name="DrillLayer" type="CanvasLayer" parent="." unique_id=100000005]
+layer = 2
+
+[node name="DrillChar" type="Node2D" parent="DrillLayer" unique_id=100000002]
+position = Vector2(300, 340)
+script = ExtResource("3_drillchar")
+
+[node name="FloatContainer" type="Node2D" parent="." unique_id=100000003]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=293736058]
+
+[node name="TunnelShaft" type="ColorRect" parent="UI" unique_id=200000001]
+offset_left = 255.0
+offset_top = 368.0
+offset_right = 345.0
+offset_bottom = 480.0
+color = Color(0.02, 0.01, 0.01, 0.82)
+
+[node name="DepthRuler" type="Control" parent="UI" unique_id=100000004]
+layout_mode = 3
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 575.0
+offset_right = 600.0
+script = ExtResource("4_depthruler")
+
+[node name="HUD" type="ColorRect" parent="UI" unique_id=300000001]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 600.0
+offset_right = 800.0
+color = Color(0.04, 0.04, 0.08, 0.92)
+
+[node name="VBox" type="VBoxContainer" parent="UI/HUD" unique_id=300000002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -80.0
+
+[node name="CoinLabel" type="Label" parent="UI/HUD/VBox" unique_id=300000010]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "💰  0"
+
+[node name="Sep1" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000020]
+layout_mode = 2
+
+[node name="DepthLabel" type="Label" parent="UI/HUD/VBox" unique_id=1166273215]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "▼  0.0 m"
+
+[node name="ProductionLabel" type="Label" parent="UI/HUD/VBox" unique_id=454812224]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "⚡  0.0 m/s"
+
+[node name="Sep2" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000021]
+layout_mode = 2
+
+[node name="LayerLabel" type="Label" parent="UI/HUD/VBox" unique_id=200000010]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+theme_override_font_sizes/font_size = 11
+text = "☰  Topsoil"
+
+[node name="DrillLabel" type="Label" parent="UI/HUD/VBox" unique_id=200000011]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "⛏  Basic Drill"
+
+[node name="Sep3" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000022]
+layout_mode = 2
+
+[node name="ShopButton" type="Button" parent="UI/HUD/VBox" unique_id=100000011]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "⚙  SHOP"
+
+[node name="TapButton" type="Button" parent="UI/HUD" unique_id=2009972929]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -72.0
+offset_right = -6.0
+offset_bottom = -6.0
+theme_override_font_sizes/font_size = 22
+text = "DRILL!"
+
+[node name="NotifBanner" type="ColorRect" parent="UI" unique_id=100000030]
+visible = false
+offset_right = 598.0
+offset_bottom = 32.0
+color = Color(0.1, 0.55, 0.15, 0.92)
+
+[node name="NotifLabel" type="Label" parent="UI/NotifBanner" unique_id=100000031]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_right = -10.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
+vertical_alignment = 1
+
+[node name="UpgradePanel" type="Control" parent="UI" unique_id=100000020]
+layout_mode = 3
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = -640.0
+offset_right = -40.0
+
+[node name="BG" type="ColorRect" parent="UI/UpgradePanel" unique_id=100000021]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.04, 0.04, 0.1, 0.96)
+
+[node name="Header" type="HBoxContainer" parent="UI/UpgradePanel" unique_id=100000022]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = 44.0
+
+[node name="TitleLabel" type="Label" parent="UI/UpgradePanel/Header" unique_id=100000023]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "UPGRADES"
+
+[node name="CloseBtn" type="Button" parent="UI/UpgradePanel/Header" unique_id=100000024]
+custom_minimum_size = Vector2(38, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "✕"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/UpgradePanel" unique_id=312849201]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 48.0
+offset_right = -2.0
+offset_bottom = -2.0
+
+[node name="UpgradeList" type="VBoxContainer" parent="UI/UpgradePanel/ScrollContainer" unique_id=887123456]
+layout_mode = 2
+size_flags_horizontal = 3
