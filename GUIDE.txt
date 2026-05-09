@@ -1,0 +1,134 @@
+════════════════════════════════════════════════════════
+  CORE DRILL — GUIA DE CONTENIDO Y CONFIGURACION
+════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────
+  SPRITES DE MATERIALES
+────────────────────────────────────────────────────────
+
+Carpeta: assets/materials/
+
+Para que un material tenga sprite propio, crea un archivo
+PNG con el mismo nombre que su "id" en materials.json.
+
+Ejemplos:
+  assets/materials/scrap.png
+  assets/materials/copper.png
+  assets/materials/gold.png
+  assets/materials/plasma.png
+
+Recomendaciones:
+  - Tamaño: 32x32 o 64x64 pixeles
+  - Fondo transparente (PNG con alpha)
+  - Estilo pixel art
+  - Si no existe el archivo, el juego usa el "symbol"
+    de texto definido en materials.json como fallback
+
+────────────────────────────────────────────────────────
+  AGREGAR UN NUEVO MATERIAL
+────────────────────────────────────────────────────────
+
+1. Abre: data/materials.json
+   Agrega una entrada al array:
+   {
+     "id": "emerald",          <- ID unico (sin espacios)
+     "name": "Emerald",        <- Nombre mostrado en UI
+     "symbol": "◆",           <- Icono de texto (fallback)
+     "color": [0.1, 0.9, 0.3, 1]  <- Color RGBA (0.0-1.0)
+   }
+
+2. Abre: data/layers.json
+   Agrega el material a los "drops" de las capas donde
+   quieras que aparezca. El "weight" es relativo:
+   weight=80 es mucho mas comun que weight=1.
+   {
+     "material": "emerald",
+     "weight": 5
+   }
+
+3. (Opcional) Agrega: assets/materials/emerald.png
+
+────────────────────────────────────────────────────────
+  AGREGAR UNA NUEVA CAPA
+────────────────────────────────────────────────────────
+
+Abre: data/layers.json
+Agrega una entrada al array (ordenado por min_depth):
+{
+  "name": "Crystal Caves",
+  "min_depth": 500000,
+  "bg_color": [0.2, 0.8, 0.9, 1],   <- Color de fondo RGBA
+  "drops": [
+    { "material": "diamond", "weight": 40 },
+    { "material": "emerald", "weight": 60 }
+  ]
+}
+
+────────────────────────────────────────────────────────
+  AGREGAR UN NUEVO UPGRADE
+────────────────────────────────────────────────────────
+
+Abre: data/upgrades.json
+Agrega una entrada:
+{
+  "id": "drill_9",            <- ID unico
+  "name": "Emerald Drill",    <- Nombre en UI
+  "desc": "+5K m/tap",        <- Descripcion corta
+  "cost": { "emerald": 3 },   <- Materiales requeridos
+  "type": "drill_power",      <- "drill_power" o "auto_drill"
+  "value": 5000               <- Cuanto suma al stat
+}
+
+────────────────────────────────────────────────────────
+  AJUSTAR VELOCIDAD DE PROGRESION
+────────────────────────────────────────────────────────
+
+Archivo: main.gd
+  const METERS_PER_DROP := 12.0
+  <- Cuantos metros taladrar para obtener un drop.
+     Mas alto = drops mas lentos = progresion mas lenta.
+
+Capas: data/layers.json
+  "min_depth": 150
+  <- Profundidad en metros para entrar a esta capa.
+     Multiplica estos valores para hacer la progresion
+     mas lenta.
+
+Upgrades: data/upgrades.json
+  "cost": { "scrap": 8 }
+  <- Aumentar costos hace la progresion mas lenta.
+  "value": 2.0
+  <- Reducir valores hace el progreso mas lento.
+
+────────────────────────────────────────────────────────
+  SPRITE DEL PERSONAJE (DRILL CHARACTER)
+────────────────────────────────────────────────────────
+
+Actualmente el personaje se dibuja con codigo en:
+  drill_char.gd (funcion _draw)
+
+Para reemplazarlo con un sprite pixel art:
+1. Agrega tu sprite en: assets/drill_character.png
+2. En drill_char.gd, reemplaza _draw() por un Sprite2D:
+   @onready var sprite = $Sprite2D
+   func tap(): _bounce = -10.0  <- mantener el bounce
+
+────────────────────────────────────────────────────────
+  ESTRUCTURA DE ARCHIVOS
+────────────────────────────────────────────────────────
+
+core-drill/
+  main.gd           <- Logica principal del juego
+  main.tscn         <- Escena principal
+  world_view.gd     <- Fondo scrollable + drop previews
+  drill_char.gd     <- Personaje (dibujado con codigo)
+  depth_ruler.gd    <- Regla de profundidad (derecha)
+  layers.gd         <- (obsoleto, reemplazado por world_view)
+  data/
+    materials.json  <- Todos los materiales
+    layers.json     <- Capas y sus tablas de drops
+    upgrades.json   <- Todas las mejoras
+  assets/
+    materials/      <- Sprites de materiales (PNG 32x32)
+
+════════════════════════════════════════════════════════

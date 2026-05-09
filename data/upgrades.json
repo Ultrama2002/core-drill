@@ -15,5 +15,12 @@
   { "id": "auto_5",  "name": "Gold Engine",    "desc": "+300 m/s",    "cost": 1600,   "type": "auto_drill",  "value": 300   },
   { "id": "auto_6",  "name": "Diamond Core",   "desc": "+1K m/s",     "cost": 5500,   "type": "auto_drill",  "value": 1000  },
   { "id": "auto_7",  "name": "Titanium Core",  "desc": "+5K m/s",     "cost": 20000,  "type": "auto_drill",  "value": 5000  },
-  { "id": "auto_8",  "name": "Plasma Core",    "desc": "+25K m/s",    "cost": 80000,  "type": "auto_drill",  "value": 25000 }
+  { "id": "auto_8",  "name": "Plasma Core",    "desc": "+25K m/s",    "cost": 80000,  "type": "auto_drill",  "value": 25000 },
+
+  { "id": "nrg_max_1",   "name": "Large Battery",  "desc": "+20 max energy",    "cost": 80,    "type": "energy_max",   "value": 20  },
+  { "id": "nrg_max_2",   "name": "Mega Battery",   "desc": "+50 max energy",    "cost": 400,   "type": "energy_max",   "value": 50  },
+  { "id": "nrg_max_3",   "name": "Plasma Cell",    "desc": "+150 max energy",   "cost": 2000,  "type": "energy_max",   "value": 150 },
+
+  { "id": "nrg_regen_1", "name": "Fast Charger",   "desc": "Regen 2x faster",   "cost": 120,   "type": "energy_regen", "value": 4   },
+  { "id": "nrg_regen_2", "name": "Turbo Charger",  "desc": "Regen 3x faster",   "cost": 800,   "type": "energy_regen", "value": 3   }
 ]

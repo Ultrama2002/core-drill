@@ -5,18 +5,273 @@ var drill_power: float = 1.0
 var auto_drill: float = 0.0
 var coins: int = 0
 
+var energy: int = 100
+var max_energy: int = 100
+var energy_regen_rate: float = 10.0   # seconds per energy point (base = 10s)
+var _energy_acc: float = 0.0
+
 var MATERIALS: Array = []
 var LAYERS: Array = []
 var UPGRADES: Array = []
 var purchased: Dictionary = {}
 
 const BASE_DROP_INTERVAL := 12.0
-const DROP_DEPTH_SCALE   := 0.018  # +0.018m interval per meter of depth
+const DROP_DEPTH_SCALE   := 0.018
 const RARE_THRESHOLD := 3
 
 var _drop_acc: float = 0.0
 var _last_depth: float = 0.0
 var _notified: Dictionary = {}
+var _last_layer_name: String = ""
+
+# ── Translation system (manual CSV parser — no Godot import needed) ───────────
+var _translations: Dictionary = {}   # { "en": { "BTN_DRILL": "DRILL!", ... }, ... }
+var _current_locale: String = "en"
+
+func _load_translations() -> void:
+	var f = FileAccess.open("res://translations.csv", FileAccess.READ)
+	if f == null:
+		push_error("translations.csv not found")
+		return
+	var header: Array = Array(f.get_csv_line())
+	# header[0] = "keys", header[1..] = locale codes
+	var locales: Array = header.slice(1)
+	for loc in locales:
+		_translations[loc] = {}
+	while not f.eof_reached():
+		var row: Array = Array(f.get_csv_line())
+		if row.size() < 2 or row[0].strip_edges().is_empty():
+			continue
+		var key: String = row[0].strip_edges()
+		for i in locales.size():
+			if i + 1 < row.size():
+				_translations[locales[i]][key] = row[i + 1]
+	f.close()
+
+func _tr(key: String) -> String:
+	var val: String = _translations.get(_current_locale, {}).get(key, "")
+	if val.is_empty():
+		val = _translations.get("en", {}).get(key, key)
+	return val
+
+# ── Button textures ───────────────────────────────────────────────────────────
+
+func _make_sb(tex: Texture2D, margin: int, tint: Color) -> StyleBoxTexture:
+	var sb := StyleBoxTexture.new()
+	sb.texture               = tex
+	sb.texture_margin_left   = margin
+	sb.texture_margin_right  = margin
+	sb.texture_margin_top    = margin
+	sb.texture_margin_bottom = margin
+	sb.modulate_color        = tint
+	# Márgenes de contenido iguales → texto perfectamente centrado
+	sb.content_margin_left   = 6.0
+	sb.content_margin_right  = 6.0
+	sb.content_margin_top    = 4.0
+	sb.content_margin_bottom = 4.0
+	return sb
+
+func _style_menu_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
+	# Botones más brillantes para que contrasten con el fondo oscuro
+	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.40, 1.35, 1.25, 1.0)))
+	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.65, 1.60, 1.50, 1.0)))
+	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(1.10, 1.05, 1.00, 1.0)))
+	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.60, 0.55, 0.50, 0.75)))
+	btn.add_theme_color_override("font_color",          Color(0.08, 0.05, 0.03, 1.0))
+	btn.add_theme_color_override("font_hover_color",    Color(0.04, 0.04, 0.08, 1.0))
+	btn.add_theme_color_override("font_pressed_color",  Color(0.00, 0.00, 0.00, 1.0))
+	btn.add_theme_color_override("font_disabled_color", Color(0.38, 0.33, 0.28, 0.9))
+
+func _apply_menu_bg(panel: Control, tex: Texture2D) -> void:
+	# Oculta el ColorRect "BG" hijo si existe (paneles deslizantes)
+	var old_bg = panel.get_node_or_null("BG")
+	if old_bg:
+		old_bg.hide()
+	var tr := TextureRect.new()
+	tr.texture         = tex
+	tr.layout_mode     = 1
+	tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tr.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	tr.grow_vertical   = Control.GROW_DIRECTION_BOTH
+	tr.stretch_mode    = TextureRect.STRETCH_SCALE
+	tr.modulate        = Color(0.48, 0.45, 0.42, 1.0)  # fondo oscuro
+	panel.add_child(tr)
+	panel.move_child(tr, 0)   # detrás de todo
+
+func _setup_ui_style() -> void:
+	var tex_drill_n: Texture2D = load("res://assets/UI/DrillBTN.png")
+	var tex_drill_p: Texture2D = load("res://assets/UI/DrillBTNPressed.png")
+	var tex_menu_n:  Texture2D = load("res://assets/UI/MenuBTN.png")
+	var tex_menu_p:  Texture2D = load("res://assets/UI/MenuBTNPressed.png")
+	var tex_side_bg:    Texture2D = load("res://assets/UI/SideMenu.png")
+	var tex_options_bg: Texture2D = load("res://assets/UI/OptionsMenu.png")
+
+	# ── Drill button ──────────────────────────────────────────────────────────
+	if tex_drill_n and tex_drill_p:
+		tap_button.add_theme_stylebox_override("normal",   _make_sb(tex_drill_n, 12, Color(1.0, 1.0, 1.0, 1.0)))
+		tap_button.add_theme_stylebox_override("hover",    _make_sb(tex_drill_n, 12, Color(1.1, 1.1, 1.1, 1.0)))
+		tap_button.add_theme_stylebox_override("pressed",  _make_sb(tex_drill_p, 12, Color(1.0, 1.0, 1.0, 1.0)))
+		tap_button.add_theme_stylebox_override("disabled", _make_sb(tex_drill_n, 12, Color(0.45, 0.40, 0.35, 0.7)))
+		tap_button.add_theme_color_override("font_color",          Color(0.10, 0.07, 0.05, 1.0))
+		tap_button.add_theme_color_override("font_hover_color",    Color(0.05, 0.05, 0.10, 1.0))
+		tap_button.add_theme_color_override("font_pressed_color",  Color(0.00, 0.00, 0.00, 1.0))
+		tap_button.add_theme_color_override("font_disabled_color", Color(0.40, 0.35, 0.30, 0.8))
+
+	# ── Fondos ───────────────────────────────────────────────────────────────
+	# SideMenu.png → HUD derecho (profundidad, coins, energía, botones)
+	if tex_side_bg:
+		var hud := $UI/HUD as ColorRect
+		hud.color = Color(0.0, 0.0, 0.0, 0.0)   # transparentar el rect base
+		_apply_menu_bg(hud, tex_side_bg)
+
+	# OptionsMenu.png → panel de configuración
+	if tex_options_bg:
+		_apply_menu_bg(settings_panel, tex_options_bg)
+
+	# ── Botones de menú ───────────────────────────────────────────────────────
+	if tex_menu_n and tex_menu_p:
+		_style_menu_btn(shop_button,     tex_menu_n, tex_menu_p)
+		_style_menu_btn(settings_button, tex_menu_n, tex_menu_p)
+		_style_menu_btn($UI/SettingsPanel/Content/ExitBtn,      tex_menu_n, tex_menu_p)
+		_style_menu_btn($UI/UpgradePanel/Header/CloseBtn,       tex_menu_n, tex_menu_p)
+		_style_menu_btn($UI/SettingsPanel/Header/CloseBtn,      tex_menu_n, tex_menu_p)
+		for btn_name in ["BtnEN", "BtnES", "BtnZH", "BtnPT", "BtnFR", "BtnDE"]:
+			var btn = $UI/SettingsPanel/Content/LangRow.get_node_or_null(btn_name)
+			if btn:
+				_style_menu_btn(btn, tex_menu_n, tex_menu_p)
+		for child in upgrade_list.get_children():
+			if child is Button:
+				_style_menu_btn(child, tex_menu_n, tex_menu_p)
+
+	# ── Sliders de volumen ────────────────────────────────────────────────────
+	_setup_sliders()
+
+	# Energy regen bar — yellow fill
+	var fill_sb := StyleBoxFlat.new()
+	fill_sb.bg_color = Color(1.0, 0.82, 0.08, 1.0)
+	fill_sb.corner_radius_top_left     = 3
+	fill_sb.corner_radius_top_right    = 3
+	fill_sb.corner_radius_bottom_left  = 3
+	fill_sb.corner_radius_bottom_right = 3
+	energy_timer.add_theme_stylebox_override("fill", fill_sb)
+
+	var bg_sb := StyleBoxFlat.new()
+	bg_sb.bg_color = Color(0.12, 0.10, 0.04, 0.85)
+	bg_sb.corner_radius_top_left     = 3
+	bg_sb.corner_radius_top_right    = 3
+	bg_sb.corner_radius_bottom_left  = 3
+	bg_sb.corner_radius_bottom_right = 3
+	energy_timer.add_theme_stylebox_override("background", bg_sb)
+
+# ── Sliders de volumen ───────────────────────────────────────────────────────
+
+func _setup_sliders() -> void:
+	var tex_track: Texture2D = load("res://assets/UI/Slide.png")
+	var tex_grab:  Texture2D = load("res://assets/UI/SlideBTN.png")
+
+	for slider in [master_slider, music_slider, sfx_slider]:
+		slider.custom_minimum_size = Vector2(0, 28)
+
+		if tex_track:
+			# Riel de fondo (zona vacía)
+			var track_sb := StyleBoxTexture.new()
+			track_sb.texture               = tex_track
+			track_sb.texture_margin_left   = 6
+			track_sb.texture_margin_right  = 6
+			track_sb.texture_margin_top    = 6
+			track_sb.texture_margin_bottom = 6
+			track_sb.modulate_color        = Color(0.55, 0.52, 0.48, 1.0)
+			slider.add_theme_stylebox_override("slider", track_sb)
+
+			# Zona rellenada (izquierda del grabber) — más brillante
+			var fill_sb := StyleBoxTexture.new()
+			fill_sb.texture               = tex_track
+			fill_sb.texture_margin_left   = 6
+			fill_sb.texture_margin_right  = 6
+			fill_sb.texture_margin_top    = 6
+			fill_sb.texture_margin_bottom = 6
+			fill_sb.modulate_color        = Color(1.30, 1.20, 0.60, 1.0)  # tono dorado
+			slider.add_theme_stylebox_override("grabber_area",           fill_sb)
+			slider.add_theme_stylebox_override("grabber_area_highlight", fill_sb)
+
+		if tex_grab:
+			slider.add_theme_icon_override("grabber",           tex_grab)
+			slider.add_theme_icon_override("grabber_highlight", tex_grab)
+			slider.add_theme_icon_override("grabber_disabled",  tex_grab)
+
+# ── Fuente retro ─────────────────────────────────────────────────────────────
+
+func _fnt(node: Control, size: int, font: Font) -> void:
+	node.add_theme_font_override("font", font)
+	node.add_theme_font_size_override("font_size", size)
+
+func _setup_font() -> void:
+	var font: Font = load("res://assets/fonts/PressStart2P-Regular.ttf")
+	if font == null:
+		return
+
+	# HUD labels
+	_fnt(coin_label,       11, font)
+	_fnt(depth_label,       9, font)
+	_fnt(production_label,  8, font)
+	_fnt(layer_label,       8, font)
+	_fnt(drill_label,       8, font)
+	_fnt(energy_label,      8, font)
+	_fnt(next_layer_label,  8, font)
+
+	# HUD buttons (drill se queda como está)
+	_fnt(shop_button,       8, font)
+	_fnt(settings_button,   8, font)
+
+	# UpgradePanel
+	_fnt($UI/UpgradePanel/Header/TitleLabel, 10, font)
+	_fnt($UI/UpgradePanel/Header/CloseBtn,   10, font)
+	for child in upgrade_list.get_children():
+		if child is Button:
+			_fnt(child, 8, font)
+
+	# SettingsPanel
+	_fnt($UI/SettingsPanel/Header/TitleLabel,      10, font)
+	_fnt($UI/SettingsPanel/Header/CloseBtn,        10, font)
+	_fnt($UI/SettingsPanel/Content/VolumeTitle,     9, font)
+	_fnt(master_label,                              8, font)
+	_fnt(music_label,                               8, font)
+	_fnt(sfx_label,                                 8, font)
+	_fnt($UI/SettingsPanel/Content/LangTitle,       9, font)
+	_fnt($UI/SettingsPanel/Content/ExitBtn,         8, font)
+	for btn_name in ["BtnEN", "BtnES", "BtnZH", "BtnPT", "BtnFR", "BtnDE"]:
+		var btn = $UI/SettingsPanel/Content/LangRow.get_node_or_null(btn_name)
+		if btn:
+			_fnt(btn, 8, font)
+
+# ── Localization ──────────────────────────────────────────────────────────────
+
+func _refresh_static_ui() -> void:
+	tap_button.text      = _tr("BTN_DRILL")
+	shop_button.text     = _tr("BTN_SHOP")
+	settings_button.text = _tr("BTN_SETTINGS")
+	$UI/SettingsPanel/Content/ExitBtn.text             = _tr("BTN_EXIT")
+	$UI/UpgradePanel/Header/TitleLabel.text             = _tr("TITLE_UPGRADES")
+	$UI/SettingsPanel/Header/TitleLabel.text            = _tr("TITLE_SETTINGS")
+	$UI/SettingsPanel/Content/VolumeTitle.text          = _tr("SETTINGS_VOLUME")
+	$UI/SettingsPanel/Content/LangTitle.text            = _tr("SETTINGS_LANG")
+	master_label.text = _tr("VOL_MASTER").format([int(master_slider.value)])
+	music_label.text  = _tr("VOL_MUSIC").format([int(music_slider.value)])
+	sfx_label.text    = _tr("VOL_SFX").format([int(sfx_slider.value)])
+
+func _set_lang(locale: String) -> void:
+	_current_locale = locale
+	_refresh_static_ui()
+
+# ── @onready refs ─────────────────────────────────────────────────────────────
+
+@onready var bg_music      = $BGMusic
+@onready var sfx_drill     = $SfxDrill
+@onready var sfx_coin      = $SfxCoin
+@onready var sfx_upgrade   = $SfxUpgrade
+@onready var sfx_noenergy  = $SfxNoEnergy
+@onready var sfx_newlayer  = $SfxNewLayer
+@onready var sfx_blip      = $SfxBlip
 
 @onready var world_view       = $WorldView
 @onready var drill_char       = $DrillLayer/DrillChar
@@ -26,25 +281,83 @@ var _notified: Dictionary = {}
 @onready var production_label = $UI/HUD/VBox/ProductionLabel
 @onready var layer_label      = $UI/HUD/VBox/LayerLabel
 @onready var drill_label      = $UI/HUD/VBox/DrillLabel
+@onready var energy_label     = $UI/HUD/VBox/EnergyLabel
+@onready var energy_bar       = $UI/HUD/VBox/EnergyBar
+@onready var energy_timer     = $UI/HUD/VBox/EnergyTimer
+@onready var next_layer_label = $UI/HUD/VBox/NextLayerLabel
+@onready var settings_button  = $UI/HUD/VBox/SettingsButton
+@onready var settings_panel   = $UI/SettingsPanel
+@onready var master_label     = $UI/SettingsPanel/Content/MasterLabel
+@onready var master_slider    = $UI/SettingsPanel/Content/MasterSlider
+@onready var music_label      = $UI/SettingsPanel/Content/MusicLabel
+@onready var music_slider     = $UI/SettingsPanel/Content/MusicSlider
+@onready var sfx_label        = $UI/SettingsPanel/Content/SFXLabel
+@onready var sfx_slider       = $UI/SettingsPanel/Content/SFXSlider
 @onready var upgrade_list     = $UI/UpgradePanel/ScrollContainer/UpgradeList
 @onready var tap_button       = $UI/HUD/TapButton
 @onready var shop_button      = $UI/HUD/VBox/ShopButton
 @onready var upgrade_panel    = $UI/UpgradePanel
 @onready var depth_ruler      = $UI/DepthRuler
 @onready var notif_label      = $UI/NotifBanner/NotifLabel
-@onready var tunnel_shaft     = $UI/TunnelShaft
+@onready var tunnel_shaft     = $TunnelLayer/TunnelShaft
 
 func _ready():
+	_load_translations()
 	_load_data()
+	_setup_audio()
 	world_view.setup(LAYERS)
 	world_view.rare_collected.connect(_on_rare_collected)
-	upgrade_panel.position.x = -640.0
-	tap_button.text = "DRILL!"
-	shop_button.text = "⚙  SHOP"
+	upgrade_panel.position.x  = -640.0
+	settings_panel.position.x = -640.0
 	tap_button.pressed.connect(_on_tap)
 	shop_button.pressed.connect(_toggle_shop)
+	settings_button.pressed.connect(_toggle_settings)
 	$UI/UpgradePanel/Header/CloseBtn.pressed.connect(_close_shop)
+	$UI/SettingsPanel/Header/CloseBtn.pressed.connect(_close_settings)
 	_build_upgrade_ui()
+	_setup_ui_style()
+	_setup_font()
+	_refresh_static_ui()
+
+# ── Audio ────────────────────────────────────────────────────────────────────
+
+func _setup_audio():
+	var music: AudioStreamMP3 = load("res://assets/ost/Lv1.mp3")
+	music.loop = true
+	bg_music.stream = music
+	bg_music.play()
+
+	sfx_drill.stream    = load("res://assets/SFX/ManualDrill1.wav")
+	sfx_coin.stream     = load("res://assets/SFX/pickupCoin.wav")
+	sfx_upgrade.stream  = load("res://assets/SFX/powerUp.wav")
+	sfx_noenergy.stream = load("res://assets/SFX/noBattery.wav")
+	sfx_newlayer.stream = load("res://assets/SFX/nextLevel.wav")
+	sfx_blip.stream     = load("res://assets/SFX/blipSelect.wav")
+
+	# Blip on all UI buttons
+	shop_button.pressed.connect(func(): sfx_blip.play())
+	settings_button.pressed.connect(func(): sfx_blip.play())
+	$UI/UpgradePanel/Header/CloseBtn.pressed.connect(func(): sfx_blip.play())
+	$UI/SettingsPanel/Header/CloseBtn.pressed.connect(func(): sfx_blip.play())
+
+	# Volume sliders
+	master_slider.value_changed.connect(_on_master_volume)
+	music_slider.value_changed.connect(_on_music_volume)
+	sfx_slider.value_changed.connect(_on_sfx_volume)
+	_on_master_volume(master_slider.value)
+	_on_music_volume(music_slider.value)
+	_on_sfx_volume(sfx_slider.value)
+
+	# Language buttons
+	$UI/SettingsPanel/Content/LangRow/BtnEN.pressed.connect(func(): _set_lang("en"))
+	$UI/SettingsPanel/Content/LangRow/BtnES.pressed.connect(func(): _set_lang("es"))
+	$UI/SettingsPanel/Content/LangRow/BtnZH.pressed.connect(func(): _set_lang("zh"))
+	$UI/SettingsPanel/Content/LangRow/BtnPT.pressed.connect(func(): _set_lang("pt"))
+	$UI/SettingsPanel/Content/LangRow/BtnFR.pressed.connect(func(): _set_lang("fr"))
+	$UI/SettingsPanel/Content/LangRow/BtnDE.pressed.connect(func(): _set_lang("de"))
+
+	# Exit
+	$UI/SettingsPanel/Content/ExitBtn.pressed.connect(func(): get_tree().quit())
 
 # ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -67,15 +380,26 @@ func _load_json(path: String) -> Array:
 func _process(delta):
 	if auto_drill > 0:
 		depth += auto_drill * delta
+	# Energy regen
+	if energy < max_energy:
+		_energy_acc += delta
+		if _energy_acc >= energy_regen_rate:
+			_energy_acc -= energy_regen_rate
+			energy = min(energy + 1, max_energy)
 	_try_drop(depth - _last_depth)
 	_last_depth = depth
 	world_view.tick_drops(depth)
 	_update_ui()
 
 func _on_tap():
+	if energy <= 0:
+		sfx_noenergy.play()
+		return
+	energy -= 1
 	depth += drill_power
 	_try_drop(drill_power)
 	drill_char.tap()
+	sfx_drill.play()
 
 # ── Input: click rare minerals ────────────────────────────────────────────────
 
@@ -97,6 +421,7 @@ func _on_rare_collected(mat_id: String, coin_value: int):
 	coins += coin_value
 	var sym = _symbol_for(mat_id)
 	_spawn_float("%s +%d💰" % [sym, coin_value])
+	sfx_coin.play()
 
 # ── Drop system ───────────────────────────────────────────────────────────────
 
@@ -133,6 +458,7 @@ func _give_material():
 			else:
 				coins += cv
 				_spawn_float("%s +%d💰" % [_symbol_for(mid), cv])
+				sfx_coin.play()
 			return
 
 func _current_layer() -> Dictionary:
@@ -165,6 +491,7 @@ func _toggle_shop():
 		_open_shop()
 
 func _open_shop():
+	_close_settings()          # ← close settings first so they never overlap
 	_refresh_upgrade_buttons()
 	var t = create_tween()
 	t.tween_property(upgrade_panel, "position:x", 0.0, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
@@ -172,6 +499,42 @@ func _open_shop():
 func _close_shop():
 	var t = create_tween()
 	t.tween_property(upgrade_panel, "position:x", -640.0, 0.20).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUART)
+
+# ── Settings panel ────────────────────────────────────────────────────────────
+
+func _toggle_settings():
+	if settings_panel.position.x > -100:
+		_close_settings()
+	else:
+		_open_settings()
+
+func _open_settings():
+	_close_shop()              # ← close shop first so they never overlap
+	var t = create_tween()
+	t.tween_property(settings_panel, "position:x", 0.0, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+
+func _close_settings():
+	var t = create_tween()
+	t.tween_property(settings_panel, "position:x", -640.0, 0.20).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUART)
+
+# ── Volume ────────────────────────────────────────────────────────────────────
+
+func _vol_to_db(v: float) -> float:
+	return linear_to_db(v / 100.0) if v > 0.0 else -80.0
+
+func _on_master_volume(v: float):
+	AudioServer.set_bus_volume_db(0, _vol_to_db(v))
+	master_label.text = _tr("VOL_MASTER").format([int(v)])
+
+func _on_music_volume(v: float):
+	bg_music.volume_db = _vol_to_db(v)
+	music_label.text = _tr("VOL_MUSIC").format([int(v)])
+
+func _on_sfx_volume(v: float):
+	var db: float = _vol_to_db(v)
+	for p in [sfx_drill, sfx_coin, sfx_upgrade, sfx_noenergy, sfx_newlayer, sfx_blip]:
+		p.volume_db = db
+	sfx_label.text = _tr("VOL_SFX").format([int(v)])
 
 # ── Upgrade notification ──────────────────────────────────────────────────────
 
@@ -202,28 +565,52 @@ func _update_ui():
 	coin_label.text = "💰  %s" % _fmt(coins)
 	depth_label.text = "▼  %s m" % _fmt_f(depth)
 	production_label.text = "⚡  %s m/s" % _fmt_f(auto_drill)
-	layer_label.text = "☰  %s" % _current_layer().get("name", "Surface")
+	var layer_name: String = _current_layer().get("name", "Surface")
+	if layer_name != _last_layer_name and _last_layer_name != "":
+		sfx_newlayer.play()
+	_last_layer_name = layer_name
+	var layer_key: String = layer_name.to_upper().replace(" ", "_")
+	layer_label.text = "☰  %s" % _tr(layer_key)
 	drill_label.text = "⛏  %s" % _get_drill_name()
+	energy_label.text = "🔋 %d / %d" % [energy, max_energy]
+	energy_bar.max_value = max_energy
+	energy_bar.value = energy
+	tap_button.disabled = (energy <= 0)
+	# Yellow regen bar: full when waiting, empty when energy is full
+	if energy >= max_energy:
+		energy_timer.value = 0.0
+	else:
+		energy_timer.value = 100.0 * (1.0 - _energy_acc / energy_regen_rate)
+
+	# Meters to next layer
+	var next_depth: float = -1.0
+	for layer in LAYERS:
+		var ld: float = float(layer["min_depth"])
+		if ld > depth:
+			if next_depth < 0.0 or ld < next_depth:
+				next_depth = ld
+	if next_depth > 0.0:
+		next_layer_label.text = "⬇  %s m" % _fmt_f(next_depth - depth)
+	else:
+		next_layer_label.text = "⬇  MAX"
+
 	_check_notifications()
 	_update_tunnel()
 	world_view.scroll_to(depth)
 	depth_ruler.update(depth)
 
-const _TUNNEL_X  := 255.0
-const _TUNNEL_W  := 90.0
-const _CHAR_Y    := 340.0   # drill center on screen
-const _DRILL_FOOT := 20.0   # offset from center to bit tip
-const _PPM       := 2.0     # pixels per meter
+const _TUNNEL_X   := 255.0
+const _TUNNEL_W   := 90.0
+const _CHAR_Y     := 340.0
+const _DRILL_FOOT := 20.0
+const _PPM        := 2.0
 
 func _update_tunnel():
-	# Shaft = already-drilled hole from surface down to drill bit tip.
-	# sky (above surface) and the drill character itself are unaffected.
 	var surface_screen_y: float = _CHAR_Y - depth * _PPM
-	var shaft_top: float    = max(0.0, surface_screen_y)
+	var shaft_top: float    = max(0.0, surface_screen_y - 32.0)
 	var shaft_bottom: float = _CHAR_Y + _DRILL_FOOT
 	var shaft_h: float      = max(0.0, shaft_bottom - shaft_top)
-	tunnel_shaft.position = Vector2(_TUNNEL_X, shaft_top)
-	tunnel_shaft.size     = Vector2(_TUNNEL_W, shaft_h)
+	tunnel_shaft.set_shaft(Vector2(_TUNNEL_X, shaft_top), _TUNNEL_W, shaft_h)
 
 func _get_drill_name() -> String:
 	var name = "Basic Drill"
@@ -236,8 +623,9 @@ func _build_upgrade_ui():
 	for upgrade in UPGRADES:
 		var btn = Button.new()
 		btn.name = upgrade["id"]
-		btn.custom_minimum_size = Vector2(0, 52)
+		btn.custom_minimum_size = Vector2(0, 64)
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
+		btn.pressed.connect(func(): sfx_blip.play())
 		btn.pressed.connect(_on_upgrade_pressed.bind(upgrade))
 		upgrade_list.add_child(btn)
 
@@ -278,9 +666,16 @@ func _on_upgrade_pressed(upgrade: Dictionary):
 	if coins < cost: return
 	coins -= cost
 	purchased[upgrade["id"]] = true
+	sfx_upgrade.play()
 	match upgrade["type"]:
-		"drill_power": drill_power += float(upgrade["value"])
-		"auto_drill":  auto_drill  += float(upgrade["value"])
+		"drill_power":  drill_power += float(upgrade["value"])
+		"auto_drill":   auto_drill  += float(upgrade["value"])
+		"energy_max":
+			max_energy += int(upgrade["value"])
+			energy = min(energy + int(upgrade["value"]), max_energy)
+			energy_bar.max_value = max_energy
+		"energy_regen":
+			energy_regen_rate = max(2.0, energy_regen_rate - float(upgrade["value"]))
 	_refresh_upgrade_buttons()
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

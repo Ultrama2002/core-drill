@@ -3,6 +3,8 @@
     "name": "Topsoil",
     "min_depth": 0,
     "bg_color": [0.55, 0.35, 0.15, 1],
+    "texture": "res://assets/materials/dirt_tile.png",
+    "surface_texture": "res://assets/materials/grass_surface.png",
     "drops": [
       { "material": "scrap",   "weight": 75 },
       { "material": "coal",    "weight": 20 },

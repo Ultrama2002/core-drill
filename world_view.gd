@@ -17,13 +17,36 @@ func setup(layers: Array):
 
 	for i in layers.size():
 		var layer = layers[i]
-		var band = ColorRect.new()
-		var c = layer["bg_color"]
-		band.color = Color(c[0], c[1], c[2], 1.0)
-		band.position = Vector2(-20, float(layer["min_depth"]) * PIXELS_PER_METER)
-		var next_depth = float(layers[i + 1]["min_depth"]) if i + 1 < layers.size() else 999_999_999.0
-		band.size = Vector2(680, (next_depth - float(layer["min_depth"])) * PIXELS_PER_METER)
-		add_child(band)
+		var next_depth: float = float(layers[i + 1]["min_depth"]) if i + 1 < layers.size() else 999_999_999.0
+		var band_pos := Vector2(-20, float(layer["min_depth"]) * PIXELS_PER_METER)
+		var band_size := Vector2(680, (next_depth - float(layer["min_depth"])) * PIXELS_PER_METER)
+		var tex_path: String = layer.get("texture", "")
+		if tex_path != "" and ResourceLoader.exists(tex_path):
+			var tex_rect := TextureRect.new()
+			tex_rect.texture = load(tex_path)
+			tex_rect.stretch_mode = TextureRect.STRETCH_TILE
+			tex_rect.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR
+			tex_rect.position = band_pos
+			tex_rect.size = band_size
+			add_child(tex_rect)
+			# Grass surface strip on top of the layer
+			var surf_path: String = layer.get("surface_texture", "")
+			if surf_path != "" and ResourceLoader.exists(surf_path):
+				var surf_rect := TextureRect.new()
+				surf_rect.texture = load(surf_path)
+				surf_rect.stretch_mode = TextureRect.STRETCH_TILE
+				surf_rect.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+				var surf_h: float = float(surf_rect.texture.get_height())
+				surf_rect.position = Vector2(band_pos.x, band_pos.y - surf_h)
+				surf_rect.size = Vector2(band_size.x, surf_h)
+				add_child(surf_rect)
+		else:
+			var band := ColorRect.new()
+			var c = layer["bg_color"]
+			band.color = Color(c[0], c[1], c[2], 1.0)
+			band.position = band_pos
+			band.size = band_size
+			add_child(band)
 
 func scroll_to(depth: float):
 	position.y = -depth * PIXELS_PER_METER + CHARACTER_SCREEN_Y

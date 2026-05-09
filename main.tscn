@@ -4,12 +4,28 @@
 [ext_resource type="Script" uid="uid://ckcb1p1esdtjo" path="res://world_view.gd" id="2_worldview"]
 [ext_resource type="Script" uid="uid://bgpebcyaiqqyp" path="res://drill_char.gd" id="3_drillchar"]
 [ext_resource type="Script" uid="uid://dmehfuw7wr68l" path="res://depth_ruler.gd" id="4_depthruler"]
+[ext_resource type="Script" uid="uid://brbwqw6irvekg" path="res://tunnel_shaft.gd" id="5_tunnelshaft"]
 
 [node name="Main" type="Node2D" unique_id=473836287]
 script = ExtResource("1_ig7tw")
 
+[node name="BGMusic" type="AudioStreamPlayer" parent="." unique_id=500000001]
+
+[node name="SfxDrill" type="AudioStreamPlayer" parent="." unique_id=500000002]
+[node name="SfxCoin" type="AudioStreamPlayer" parent="." unique_id=500000003]
+[node name="SfxUpgrade" type="AudioStreamPlayer" parent="." unique_id=500000004]
+[node name="SfxNoEnergy" type="AudioStreamPlayer" parent="." unique_id=500000005]
+[node name="SfxNewLayer" type="AudioStreamPlayer" parent="." unique_id=500000006]
+[node name="SfxBlip" type="AudioStreamPlayer" parent="." unique_id=500000007]
+
 [node name="WorldView" type="Node2D" parent="." unique_id=100000001]
 script = ExtResource("2_worldview")
+
+[node name="TunnelLayer" type="CanvasLayer" parent="." unique_id=700000001]
+layer = 1
+
+[node name="TunnelShaft" type="Node2D" parent="TunnelLayer" unique_id=200000001]
+script = ExtResource("5_tunnelshaft")
 
 [node name="DrillLayer" type="CanvasLayer" parent="." unique_id=100000005]
 layer = 2
@@ -21,13 +37,7 @@ script = ExtResource("3_drillchar")
 [node name="FloatContainer" type="Node2D" parent="." unique_id=100000003]
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=293736058]
-
-[node name="TunnelShaft" type="ColorRect" parent="UI" unique_id=200000001]
-offset_left = 255.0
-offset_top = 368.0
-offset_right = 345.0
-offset_bottom = 480.0
-color = Color(0.02, 0.01, 0.01, 0.82)
+layer = 3
 
 [node name="DepthRuler" type="Control" parent="UI" unique_id=100000004]
 layout_mode = 3
@@ -35,6 +45,7 @@ anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 575.0
 offset_right = 600.0
+grow_vertical = 2
 script = ExtResource("4_depthruler")
 
 [node name="HUD" type="ColorRect" parent="UI" unique_id=300000001]
@@ -53,6 +64,8 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = -8.0
 offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="CoinLabel" type="Label" parent="UI/HUD/VBox" unique_id=300000010]
 layout_mode = 2
@@ -90,13 +103,49 @@ theme_override_colors/font_color = Color(0.6, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 11
 text = "⛏  Basic Drill"
 
+[node name="Sep_nrg" type="HSeparator" parent="UI/HUD/VBox" unique_id=400000003]
+layout_mode = 2
+
+[node name="EnergyLabel" type="Label" parent="UI/HUD/VBox" unique_id=400000002]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 1.0, 1)
+theme_override_font_sizes/font_size = 11
+text = "🔋 30 / 30"
+
+[node name="EnergyBar" type="ProgressBar" parent="UI/HUD/VBox" unique_id=400000001]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="EnergyTimer" type="ProgressBar" parent="UI/HUD/VBox" unique_id=400000004]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 7)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="NextLayerLabel" type="Label" parent="UI/HUD/VBox" unique_id=800000001]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 1.0, 0.55, 1)
+theme_override_font_sizes/font_size = 10
+text = "▼  - m"
+
 [node name="Sep3" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000022]
 layout_mode = 2
 
 [node name="ShopButton" type="Button" parent="UI/HUD/VBox" unique_id=100000011]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
 theme_override_font_sizes/font_size = 13
 text = "⚙  SHOP"
+
+[node name="SettingsButton" type="Button" parent="UI/HUD/VBox" unique_id=600000001]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_override_font_sizes/font_size = 13
+text = "🔧  SETTINGS"
 
 [node name="TapButton" type="Button" parent="UI/HUD" unique_id=2009972929]
 layout_mode = 1
@@ -108,6 +157,8 @@ offset_left = 6.0
 offset_top = -72.0
 offset_right = -6.0
 offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_override_font_sizes/font_size = 22
 text = "DRILL!"
 
@@ -124,6 +175,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
 offset_right = -10.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 12
 vertical_alignment = 1
@@ -134,12 +187,15 @@ anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = -640.0
 offset_right = -40.0
+grow_vertical = 2
 
 [node name="BG" type="ColorRect" parent="UI/UpgradePanel" unique_id=100000021]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.04, 0.04, 0.1, 0.96)
 
 [node name="Header" type="HBoxContainer" parent="UI/UpgradePanel" unique_id=100000022]
@@ -150,6 +206,7 @@ offset_left = 8.0
 offset_top = 4.0
 offset_right = -8.0
 offset_bottom = 44.0
+grow_horizontal = 2
 
 [node name="TitleLabel" type="Label" parent="UI/UpgradePanel/Header" unique_id=100000023]
 layout_mode = 2
@@ -159,7 +216,7 @@ theme_override_font_sizes/font_size = 16
 text = "UPGRADES"
 
 [node name="CloseBtn" type="Button" parent="UI/UpgradePanel/Header" unique_id=100000024]
-custom_minimum_size = Vector2(38, 0)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "✕"
@@ -173,7 +230,158 @@ offset_left = 2.0
 offset_top = 48.0
 offset_right = -2.0
 offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="UpgradeList" type="VBoxContainer" parent="UI/UpgradePanel/ScrollContainer" unique_id=887123456]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="SettingsPanel" type="Control" parent="UI" unique_id=600000002]
+layout_mode = 3
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = -640.0
+offset_right = -40.0
+grow_vertical = 2
+
+[node name="BG" type="ColorRect" parent="UI/SettingsPanel" unique_id=600000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.10, 0.97)
+
+[node name="Header" type="HBoxContainer" parent="UI/SettingsPanel" unique_id=600000004]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = 44.0
+grow_horizontal = 2
+
+[node name="TitleLabel" type="Label" parent="UI/SettingsPanel/Header" unique_id=600000005]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "SETTINGS"
+
+[node name="CloseBtn" type="Button" parent="UI/SettingsPanel/Header" unique_id=600000006]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "✕"
+
+[node name="Content" type="VBoxContainer" parent="UI/SettingsPanel" unique_id=600000007]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 52.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VolumeTitle" type="Label" parent="UI/SettingsPanel/Content" unique_id=600000008]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "🔊  VOLUME"
+
+[node name="MasterLabel" type="Label" parent="UI/SettingsPanel/Content" unique_id=600000009]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "Master  100%"
+
+[node name="MasterSlider" type="HSlider" parent="UI/SettingsPanel/Content" unique_id=600000010]
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+
+[node name="MusicLabel" type="Label" parent="UI/SettingsPanel/Content" unique_id=600000011]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "Music  100%"
+
+[node name="MusicSlider" type="HSlider" parent="UI/SettingsPanel/Content" unique_id=600000012]
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+
+[node name="SFXLabel" type="Label" parent="UI/SettingsPanel/Content" unique_id=600000013]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "SFX  100%"
+
+[node name="SFXSlider" type="HSlider" parent="UI/SettingsPanel/Content" unique_id=600000014]
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+
+[node name="SepLang" type="HSeparator" parent="UI/SettingsPanel/Content" unique_id=600000015]
+layout_mode = 2
+
+[node name="LangTitle" type="Label" parent="UI/SettingsPanel/Content" unique_id=600000016]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "🌐  LANGUAGE"
+
+[node name="LangRow" type="HBoxContainer" parent="UI/SettingsPanel/Content" unique_id=600000017]
+layout_mode = 2
+
+[node name="BtnEN" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000018]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 44)
+theme_override_font_sizes/font_size = 12
+text = "EN"
+
+[node name="BtnES" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000019]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 44)
+theme_override_font_sizes/font_size = 12
+text = "ES"
+
+[node name="BtnZH" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000020]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 44)
+theme_override_font_sizes/font_size = 12
+text = "ZH"
+
+[node name="BtnPT" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000021]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 44)
+theme_override_font_sizes/font_size = 12
+text = "PT"
+
+[node name="BtnFR" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000022]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 44)
+theme_override_font_sizes/font_size = 12
+text = "FR"
+
+[node name="BtnDE" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000023]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 44)
+theme_override_font_sizes/font_size = 12
+text = "DE"
+
+[node name="SepExit" type="HSeparator" parent="UI/SettingsPanel/Content" unique_id=600000024]
+layout_mode = 2
+
+[node name="ExitBtn" type="Button" parent="UI/SettingsPanel/Content" unique_id=600000025]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "✕  Exit Game"
