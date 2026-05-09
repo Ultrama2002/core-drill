@@ -82,15 +82,46 @@ func _style_menu_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
 	btn.add_theme_color_override("font_disabled_color", Color(0.38, 0.33, 0.28, 0.9))
 
 func _style_danger_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
-	# Rojo para Exit y botones de cerrar
-	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.50, 0.28, 0.28, 1.0)))
-	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.80, 0.35, 0.35, 1.0)))
-	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(1.10, 0.20, 0.20, 1.0)))
-	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.55, 0.30, 0.30, 0.75)))
+	# Rojo desaturado (ladrillo) para Exit y botones de cerrar
+	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.05, 0.52, 0.52, 1.0)))
+	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.20, 0.62, 0.62, 1.0)))
+	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(0.82, 0.38, 0.38, 1.0)))
+	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.55, 0.40, 0.40, 0.75)))
 	btn.add_theme_color_override("font_color",          Color(1.00, 1.00, 1.00, 1.0))
 	btn.add_theme_color_override("font_hover_color",    Color(1.00, 1.00, 1.00, 1.0))
 	btn.add_theme_color_override("font_pressed_color",  Color(0.90, 0.90, 0.90, 1.0))
-	btn.add_theme_color_override("font_disabled_color", Color(0.70, 0.55, 0.55, 0.9))
+	btn.add_theme_color_override("font_disabled_color", Color(0.70, 0.58, 0.58, 0.9))
+
+func _setup_bar(bar: ProgressBar, fill_color: Color, bg_color: Color, overlay_tex: Texture2D) -> void:
+	# Fondo (zona vacía) — color sólido oscuro
+	var bg_sb := StyleBoxFlat.new()
+	bg_sb.bg_color = bg_color
+	bg_sb.corner_radius_top_left     = 3
+	bg_sb.corner_radius_top_right    = 3
+	bg_sb.corner_radius_bottom_left  = 3
+	bg_sb.corner_radius_bottom_right = 3
+	bar.add_theme_stylebox_override("background", bg_sb)
+
+	# Relleno (zona llena) — color sólido vivo
+	var fill_sb := StyleBoxFlat.new()
+	fill_sb.bg_color = fill_color
+	fill_sb.corner_radius_top_left     = 3
+	fill_sb.corner_radius_top_right    = 3
+	fill_sb.corner_radius_bottom_left  = 3
+	fill_sb.corner_radius_bottom_right = 3
+	bar.add_theme_stylebox_override("fill", fill_sb)
+
+	# PNG encima como overlay decorativo (transparente en el centro)
+	if overlay_tex:
+		var tr := TextureRect.new()
+		tr.texture      = overlay_tex
+		tr.layout_mode  = 1
+		tr.set_anchors_preset(Control.PRESET_FULL_RECT)
+		tr.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		tr.grow_vertical   = Control.GROW_DIRECTION_BOTH
+		tr.stretch_mode    = TextureRect.STRETCH_SCALE
+		tr.mouse_filter    = Control.MOUSE_FILTER_IGNORE
+		bar.add_child(tr)
 
 func _apply_menu_bg(panel: Control, tex: Texture2D) -> void:
 	# Oculta el ColorRect "BG" hijo si existe (paneles deslizantes)
@@ -155,49 +186,17 @@ func _setup_ui_style() -> void:
 		_style_danger_btn($UI/UpgradePanel/Header/CloseBtn,  tex_menu_n, tex_menu_p)
 		_style_danger_btn($UI/SettingsPanel/Header/CloseBtn, tex_menu_n, tex_menu_p)
 
-	# ── Barras de energía ─────────────────────────────────────────────────────
-	var tex_ebar:    Texture2D = load("res://assets/UI/EnergyBar.png")
-	var tex_rebar:   Texture2D = load("res://assets/UI/RecharchBar.png")
+	# ── Barras de energía: color plano abajo + PNG encima como overlay ────────
+	var tex_ebar:  Texture2D = load("res://assets/UI/EnergyBar.png")
+	var tex_rebar: Texture2D = load("res://assets/UI/RecharchBar.png")
 
-	if tex_ebar:
-		var fill := StyleBoxTexture.new()
-		fill.texture = tex_ebar
-		fill.modulate_color = Color(0.25, 1.30, 0.35, 1.0)   # verde vivo
-		energy_bar.add_theme_stylebox_override("fill", fill)
-		var bg := StyleBoxTexture.new()
-		bg.texture = tex_ebar
-		bg.modulate_color = Color(0.10, 0.22, 0.12, 0.85)    # verde oscuro fondo
-		energy_bar.add_theme_stylebox_override("background", bg)
-
-	if tex_rebar:
-		var fill := StyleBoxTexture.new()
-		fill.texture = tex_rebar
-		fill.modulate_color = Color(1.30, 0.95, 0.10, 1.0)   # amarillo vivo
-		energy_timer.add_theme_stylebox_override("fill", fill)
-		var bg := StyleBoxTexture.new()
-		bg.texture = tex_rebar
-		bg.modulate_color = Color(0.22, 0.18, 0.04, 0.85)    # amarillo oscuro fondo
-		energy_timer.add_theme_stylebox_override("background", bg)
+	_setup_bar(energy_bar,  Color(0.15, 0.88, 0.28, 1.0), Color(0.04, 0.18, 0.07, 0.9), tex_ebar)
+	_setup_bar(energy_timer, Color(1.00, 0.82, 0.08, 1.0), Color(0.18, 0.14, 0.03, 0.9), tex_rebar)
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
 
-	# Energy regen bar — yellow fill
-	var fill_sb := StyleBoxFlat.new()
-	fill_sb.bg_color = Color(1.0, 0.82, 0.08, 1.0)
-	fill_sb.corner_radius_top_left     = 3
-	fill_sb.corner_radius_top_right    = 3
-	fill_sb.corner_radius_bottom_left  = 3
-	fill_sb.corner_radius_bottom_right = 3
-	energy_timer.add_theme_stylebox_override("fill", fill_sb)
-
-	var bg_sb := StyleBoxFlat.new()
-	bg_sb.bg_color = Color(0.12, 0.10, 0.04, 0.85)
-	bg_sb.corner_radius_top_left     = 3
-	bg_sb.corner_radius_top_right    = 3
-	bg_sb.corner_radius_bottom_left  = 3
-	bg_sb.corner_radius_bottom_right = 3
-	energy_timer.add_theme_stylebox_override("background", bg_sb)
+	# (barras de energía configuradas en _setup_ui_style via _setup_bar)
 
 # ── Sliders de volumen ───────────────────────────────────────────────────────
 
