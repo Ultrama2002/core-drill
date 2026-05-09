@@ -1,25 +1,25 @@
 keys,en,es,zh,pt,fr,de
-BTN_DRILL,DRILL!,¡TALADRAR!,钻探！,PERFURAR!,FORER!,BOHREN!
-BTN_SHOP,⚙  SHOP,⚙  TIENDA,⚙  商店,⚙  LOJA,⚙  BOUTIQUE,⚙  LADEN
-BTN_SETTINGS,🔧  SETTINGS,🔧  AJUSTES,🔧  CONFIGURACIÓN,🔧  CONFIG.,🔧  PARAMÈTRES,🔧  EINSTELLUNGEN
-BTN_EXIT,✕  Exit Game,✕  Salir del juego,✕  退出游戏,✕  Sair do jogo,✕  Quitter le jeu,✕  Spiel beenden
-TITLE_UPGRADES,UPGRADES,MEJORAS,升级,MELHORIAS,AMÉLIORATIONS,UPGRADES
-TITLE_SETTINGS,SETTINGS,AJUSTES,设置,CONFIGURAÇÕES,PARAMÈTRES,EINSTELLUNGEN
+BTN_DRILL,DRILL!,TALADRAR!,钻探！,PERFURAR!,FORER!,BOHREN!
+BTN_SHOP,SHOP,TIENDA,商店,LOJA,BOUTIQUE,LADEN
+BTN_SETTINGS,SETTINGS,AJUSTES,设置,CONFIG.,PARAMETRES,EINSTELLUNGEN
+BTN_EXIT,Exit Game,Salir del juego,退出游戏,Sair do jogo,Quitter le jeu,Spiel beenden
+TITLE_UPGRADES,UPGRADES,MEJORAS,升级,MELHORIAS,AMELIORATIONS,UPGRADES
+TITLE_SETTINGS,SETTINGS,AJUSTES,设置,CONFIGURACOES,PARAMETRES,EINSTELLUNGEN
 ENERGY_FULL,Full,Llena,满,Cheia,Pleine,Voll
-ENERGY_NEXT,Next: {0}s,Siguiente: {0}s,下次：{0}s,Próximo: {0}s,Suivant: {0}s,Nächste: {0}s
+ENERGY_NEXT,Next: {0}s,Siguiente: {0}s,下次：{0}s,Proximo: {0}s,Suivant: {0}s,Nachste: {0}s
 VOL_MASTER,Master  {0}%,Master  {0}%,主音量  {0}%,Master  {0}%,Master  {0}%,Master  {0}%
-VOL_MUSIC,Music  {0}%,Música  {0}%,音乐  {0}%,Música  {0}%,Musique  {0}%,Musik  {0}%
+VOL_MUSIC,Music  {0}%,Musica  {0}%,音乐  {0}%,Musica  {0}%,Musique  {0}%,Musik  {0}%
 VOL_SFX,SFX  {0}%,Efectos  {0}%,音效  {0}%,Efeitos  {0}%,Effets  {0}%,Effekte  {0}%
-SETTINGS_VOLUME,🔊  VOLUME,🔊  VOLUMEN,🔊  音量,🔊  VOLUME,🔊  VOLUME,🔊  LAUTSTÄRKE
-SETTINGS_LANG,🌐  LANGUAGE,🌐  IDIOMA,🌐  语言,🌐  IDIOMA,🌐  LANGUE,🌐  SPRACHE
-TOPSOIL,Topsoil,Tierra superficial,表土,Solo superficial,Terre végétale,Oberboden
+SETTINGS_VOLUME,VOLUME,VOLUMEN,音量,VOLUME,VOLUME,LAUTSTARKE
+SETTINGS_LANG,LANGUAGE,IDIOMA,语言,IDIOMA,LANGUE,SPRACHE
+TOPSOIL,Topsoil,Tierra superficial,表土,Solo superficial,Terre vegetale,Oberboden
 CLAY,Clay,Arcilla,黏土,Argila,Argile,Ton
-SANDSTONE,Sandstone,Arenisca,砂岩,Arenito,Grès,Sandstein
-LIMESTONE,Limestone,Piedra caliza,石灰岩,Calcário,Calcaire,Kalkstein
+SANDSTONE,Sandstone,Arenisca,砂岩,Arenito,Gres,Sandstein
+LIMESTONE,Limestone,Piedra caliza,石灰岩,Calcario,Calcaire,Kalkstein
 GRANITE,Granite,Granito,花岗岩,Granito,Granit,Granit
 BASALT,Basalt,Basalto,玄武岩,Basalto,Basalte,Basalt
 MANTLE,Mantle,Manto,地幔,Manto,Manteau,Mantel
-OUTER_CORE,Outer Core,Núcleo Externo,外核,Núcleo Externo,Noyau Externe,Äußerer Kern
-INNER_CORE,Inner Core,Núcleo Interno,内核,Núcleo Interno,Noyau Interne,Innerer Kern
-DIMENSION_I,Dimension I,Dimensión I,维度 I,Dimensão I,Dimension I,Dimension I
-DIMENSION_II,Dimension II,Dimensión II,维度 II,Dimensão II,Dimension II,Dimension II
+OUTER_CORE,Outer Core,Nucleo Externo,外核,Nucleo Externo,Noyau Externe,Ausserer Kern
+INNER_CORE,Inner Core,Nucleo Interno,内核,Nucleo Interno,Noyau Interne,Innerer Kern
+DIMENSION_I,Dimension I,Dimension I,维度 I,Dimensao I,Dimension I,Dimension I
+DIMENSION_II,Dimension II,Dimension II,维度 II,Dimensao II,Dimension II,Dimension II

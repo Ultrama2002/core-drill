@@ -219,7 +219,8 @@ func _setup_font() -> void:
 	_fnt(energy_label,      8, font)
 	_fnt(next_layer_label,  8, font)
 
-	# HUD buttons (drill se queda como está)
+	# HUD buttons
+	_fnt(tap_button,       10, font)
 	_fnt(shop_button,       8, font)
 	_fnt(settings_button,   8, font)
 
@@ -420,7 +421,7 @@ func _input(event):
 func _on_rare_collected(mat_id: String, coin_value: int):
 	coins += coin_value
 	var sym = _symbol_for(mat_id)
-	_spawn_float("%s +%d💰" % [sym, coin_value])
+	_spawn_float("%s +%d" % [sym, coin_value])
 	sfx_coin.play()
 
 # ── Drop system ───────────────────────────────────────────────────────────────
@@ -457,7 +458,7 @@ func _give_material():
 				world_view.spawn_rare_clickable(mid, _symbol_for(mid), rarity, cv, spawn_depth)
 			else:
 				coins += cv
-				_spawn_float("%s +%d💰" % [_symbol_for(mid), cv])
+				_spawn_float("%s +%d" % [_symbol_for(mid), cv])
 				sfx_coin.play()
 			return
 
@@ -545,7 +546,7 @@ func _check_notifications():
 		if purchased.get(uid, false): continue
 		if coins >= int(upgrade["cost"]):
 			_notified[uid] = true
-			_show_notif("⬆  Upgrade ready: %s" % upgrade["name"])
+			_show_notif("Upgrade ready: %s" % upgrade["name"])
 			break
 
 func _show_notif(text: String):
@@ -562,17 +563,17 @@ func _show_notif(text: String):
 # ── UI ────────────────────────────────────────────────────────────────────────
 
 func _update_ui():
-	coin_label.text = "💰  %s" % _fmt(coins)
-	depth_label.text = "▼  %s m" % _fmt_f(depth)
-	production_label.text = "⚡  %s m/s" % _fmt_f(auto_drill)
+	coin_label.text = "%s" % _fmt(coins)
+	depth_label.text = "%s m" % _fmt_f(depth)
+	production_label.text = "%s m/s" % _fmt_f(auto_drill)
 	var layer_name: String = _current_layer().get("name", "Surface")
 	if layer_name != _last_layer_name and _last_layer_name != "":
 		sfx_newlayer.play()
 	_last_layer_name = layer_name
 	var layer_key: String = layer_name.to_upper().replace(" ", "_")
-	layer_label.text = "☰  %s" % _tr(layer_key)
-	drill_label.text = "⛏  %s" % _get_drill_name()
-	energy_label.text = "🔋 %d / %d" % [energy, max_energy]
+	layer_label.text = _tr(layer_key)
+	drill_label.text = _get_drill_name()
+	energy_label.text = "%d / %d" % [energy, max_energy]
 	energy_bar.max_value = max_energy
 	energy_bar.value = energy
 	tap_button.disabled = (energy <= 0)
@@ -590,9 +591,9 @@ func _update_ui():
 			if next_depth < 0.0 or ld < next_depth:
 				next_depth = ld
 	if next_depth > 0.0:
-		next_layer_label.text = "⬇  %s m" % _fmt_f(next_depth - depth)
+		next_layer_label.text = "%s m" % _fmt_f(next_depth - depth)
 	else:
-		next_layer_label.text = "⬇  MAX"
+		next_layer_label.text = "MAX"
 
 	_check_notifications()
 	_update_tunnel()

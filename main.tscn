@@ -71,7 +71,7 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
 theme_override_font_sizes/font_size = 20
-text = "💰  0"
+text = "0"
 
 [node name="Sep1" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000020]
 layout_mode = 2
@@ -80,13 +80,13 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 14
-text = "▼  0.0 m"
+text = "0.0 m"
 
 [node name="ProductionLabel" type="Label" parent="UI/HUD/VBox" unique_id=454812224]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 1, 0.6, 1)
 theme_override_font_sizes/font_size = 12
-text = "⚡  0.0 m/s"
+text = "0.0 m/s"
 
 [node name="Sep2" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000021]
 layout_mode = 2
@@ -95,13 +95,13 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
 theme_override_font_sizes/font_size = 11
-text = "☰  Topsoil"
+text = "Topsoil"
 
 [node name="DrillLabel" type="Label" parent="UI/HUD/VBox" unique_id=200000011]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 11
-text = "⛏  Basic Drill"
+text = "Basic Drill"
 
 [node name="Sep_nrg" type="HSeparator" parent="UI/HUD/VBox" unique_id=400000003]
 layout_mode = 2
@@ -110,7 +110,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 1.0, 1)
 theme_override_font_sizes/font_size = 11
-text = "🔋 30 / 30"
+text = "30 / 30"
 
 [node name="EnergyBar" type="ProgressBar" parent="UI/HUD/VBox" unique_id=400000001]
 layout_mode = 2
@@ -139,13 +139,13 @@ layout_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_override_font_sizes/font_size = 13
-text = "⚙  SHOP"
+text = "SHOP"
 
 [node name="SettingsButton" type="Button" parent="UI/HUD/VBox" unique_id=600000001]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_override_font_sizes/font_size = 13
-text = "🔧  SETTINGS"
+text = "SETTINGS"
 
 [node name="TapButton" type="Button" parent="UI/HUD" unique_id=2009972929]
 layout_mode = 1
@@ -219,7 +219,7 @@ text = "UPGRADES"
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "✕"
+text = "X"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UI/UpgradePanel" unique_id=312849201]
 layout_mode = 1
@@ -275,7 +275,7 @@ text = "SETTINGS"
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "✕"
+text = "X"
 
 [node name="Content" type="VBoxContainer" parent="UI/SettingsPanel" unique_id=600000007]
 layout_mode = 1
@@ -293,7 +293,7 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 13
-text = "🔊  VOLUME"
+text = "VOLUME"
 
 [node name="MasterLabel" type="Label" parent="UI/SettingsPanel/Content" unique_id=600000009]
 layout_mode = 2
@@ -335,7 +335,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 13
-text = "🌐  LANGUAGE"
+text = "LANGUAGE"
 
 [node name="LangRow" type="HBoxContainer" parent="UI/SettingsPanel/Content" unique_id=600000017]
 layout_mode = 2
@@ -384,4 +384,4 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_font_sizes/font_size = 13
-text = "✕  Exit Game"
+text = "Exit Game"
