@@ -72,7 +72,6 @@ func _make_sb(tex: Texture2D, margin: int, tint: Color) -> StyleBoxTexture:
 	return sb
 
 func _style_menu_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
-	# Botones más brillantes para que contrasten con el fondo oscuro
 	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.40, 1.35, 1.25, 1.0)))
 	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.65, 1.60, 1.50, 1.0)))
 	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(1.10, 1.05, 1.00, 1.0)))
@@ -81,6 +80,17 @@ func _style_menu_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
 	btn.add_theme_color_override("font_hover_color",    Color(0.04, 0.04, 0.08, 1.0))
 	btn.add_theme_color_override("font_pressed_color",  Color(0.00, 0.00, 0.00, 1.0))
 	btn.add_theme_color_override("font_disabled_color", Color(0.38, 0.33, 0.28, 0.9))
+
+func _style_danger_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
+	# Rojo para Exit y botones de cerrar
+	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.50, 0.28, 0.28, 1.0)))
+	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.80, 0.35, 0.35, 1.0)))
+	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(1.10, 0.20, 0.20, 1.0)))
+	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.55, 0.30, 0.30, 0.75)))
+	btn.add_theme_color_override("font_color",          Color(1.00, 1.00, 1.00, 1.0))
+	btn.add_theme_color_override("font_hover_color",    Color(1.00, 1.00, 1.00, 1.0))
+	btn.add_theme_color_override("font_pressed_color",  Color(0.90, 0.90, 0.90, 1.0))
+	btn.add_theme_color_override("font_disabled_color", Color(0.70, 0.55, 0.55, 0.9))
 
 func _apply_menu_bg(panel: Control, tex: Texture2D) -> void:
 	# Oculta el ColorRect "BG" hijo si existe (paneles deslizantes)
@@ -132,9 +142,6 @@ func _setup_ui_style() -> void:
 	if tex_menu_n and tex_menu_p:
 		_style_menu_btn(shop_button,     tex_menu_n, tex_menu_p)
 		_style_menu_btn(settings_button, tex_menu_n, tex_menu_p)
-		_style_menu_btn($UI/SettingsPanel/Content/ExitBtn,      tex_menu_n, tex_menu_p)
-		_style_menu_btn($UI/UpgradePanel/Header/CloseBtn,       tex_menu_n, tex_menu_p)
-		_style_menu_btn($UI/SettingsPanel/Header/CloseBtn,      tex_menu_n, tex_menu_p)
 		for btn_name in ["BtnEN", "BtnES", "BtnZH", "BtnPT", "BtnFR", "BtnDE"]:
 			var btn = $UI/SettingsPanel/Content/LangRow.get_node_or_null(btn_name)
 			if btn:
@@ -142,6 +149,35 @@ func _setup_ui_style() -> void:
 		for child in upgrade_list.get_children():
 			if child is Button:
 				_style_menu_btn(child, tex_menu_n, tex_menu_p)
+
+		# Rojos: cerrar y salir
+		_style_danger_btn($UI/SettingsPanel/Content/ExitBtn, tex_menu_n, tex_menu_p)
+		_style_danger_btn($UI/UpgradePanel/Header/CloseBtn,  tex_menu_n, tex_menu_p)
+		_style_danger_btn($UI/SettingsPanel/Header/CloseBtn, tex_menu_n, tex_menu_p)
+
+	# ── Barras de energía ─────────────────────────────────────────────────────
+	var tex_ebar:    Texture2D = load("res://assets/UI/EnergyBar.png")
+	var tex_rebar:   Texture2D = load("res://assets/UI/RecharchBar.png")
+
+	if tex_ebar:
+		var fill := StyleBoxTexture.new()
+		fill.texture = tex_ebar
+		fill.modulate_color = Color(0.25, 1.30, 0.35, 1.0)   # verde vivo
+		energy_bar.add_theme_stylebox_override("fill", fill)
+		var bg := StyleBoxTexture.new()
+		bg.texture = tex_ebar
+		bg.modulate_color = Color(0.10, 0.22, 0.12, 0.85)    # verde oscuro fondo
+		energy_bar.add_theme_stylebox_override("background", bg)
+
+	if tex_rebar:
+		var fill := StyleBoxTexture.new()
+		fill.texture = tex_rebar
+		fill.modulate_color = Color(1.30, 0.95, 0.10, 1.0)   # amarillo vivo
+		energy_timer.add_theme_stylebox_override("fill", fill)
+		var bg := StyleBoxTexture.new()
+		bg.texture = tex_rebar
+		bg.modulate_color = Color(0.22, 0.18, 0.04, 0.85)    # amarillo oscuro fondo
+		energy_timer.add_theme_stylebox_override("background", bg)
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
