@@ -8,7 +8,7 @@ TITLE_SETTINGS,SETTINGS,AJUSTES,设置,CONFIGURACOES,PARAMETRES,EINSTELLUNGEN
 ENERGY_FULL,Full,Llena,满,Cheia,Pleine,Voll
 ENERGY_NEXT,Next: {0}s,Siguiente: {0}s,下次：{0}s,Proximo: {0}s,Suivant: {0}s,Nachste: {0}s
 VOL_MASTER,Master  {0}%,Master  {0}%,主音量  {0}%,Master  {0}%,Master  {0}%,Master  {0}%
-VOL_MUSIC,Music  {0}%,Musica  {0}%,音乐  {0}%,Musica  {0}%,Musique  {0}%,Musik  {0}%
+VOL_MUSIC,MUSIC  {0}%,MUSICA  {0}%,音乐  {0}%,MUSICA  {0}%,MUSIQUE  {0}%,MUSIK  {0}%
 VOL_SFX,SFX  {0}%,Efectos  {0}%,音效  {0}%,Efeitos  {0}%,Effets  {0}%,Effekte  {0}%
 SETTINGS_VOLUME,VOLUME,VOLUMEN,音量,VOLUME,VOLUME,LAUTSTARKE
 SETTINGS_LANG,LANGUAGE,IDIOMA,语言,IDIOMA,LANGUE,SPRACHE

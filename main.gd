@@ -127,6 +127,10 @@ func _add_icon_inline(label: Label, tex: Texture2D, tint: Color, icon_px: int = 
 	var hbox   := HBoxContainer.new()
 	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	hbox.add_theme_constant_override("separation", 5)
+	# Heredar size_flags del label → si el label era expand+fill, el HBox también lo será
+	# (crítico para que el CloseBtn del settings quede a la derecha)
+	hbox.size_flags_horizontal = label.size_flags_horizontal
+	hbox.size_flags_vertical   = label.size_flags_vertical
 	parent.add_child(hbox)
 	parent.move_child(hbox, idx)
 	var tr := TextureRect.new()
@@ -222,10 +226,30 @@ func _setup_ui_style() -> void:
 	if tex_menu_n and tex_menu_p:
 		_style_menu_btn(shop_button,     tex_menu_n, tex_menu_p)
 		_style_menu_btn(settings_button, tex_menu_n, tex_menu_p)
-		for btn_name in ["BtnEN", "BtnES", "BtnZH", "BtnPT", "BtnFR", "BtnDE"]:
+		# Botones de idioma con colores de bandera
+		var flag_colors := {
+			"BtnEN": Color(0.52, 0.60, 0.90, 1.0),   # azul Union Jack
+			"BtnES": Color(0.88, 0.74, 0.16, 1.0),   # dorado bandera española
+			"BtnZH": Color(0.90, 0.26, 0.20, 1.0),   # rojo chino
+			"BtnPT": Color(0.20, 0.66, 0.32, 1.0),   # verde brasileño
+			"BtnFR": Color(0.35, 0.45, 0.88, 1.0),   # azul francés
+			"BtnDE": Color(0.88, 0.76, 0.12, 1.0),   # dorado alemán
+		}
+		for btn_name in flag_colors:
 			var btn = $UI/SettingsPanel/Content/LangRow.get_node_or_null(btn_name)
-			if btn:
-				_style_menu_btn(btn, tex_menu_n, tex_menu_p)
+			if btn == null: continue
+			var nc: Color = flag_colors[btn_name]
+			btn.add_theme_stylebox_override("normal",   _make_sb(tex_menu_n, 10, nc))
+			btn.add_theme_stylebox_override("hover",    _make_sb(tex_menu_n, 10, nc.lightened(0.18)))
+			btn.add_theme_stylebox_override("pressed",  _make_sb(tex_menu_p, 10, nc.darkened(0.18)))
+			btn.add_theme_stylebox_override("disabled", _make_sb(tex_menu_n, 10, Color(nc.r*0.5, nc.g*0.5, nc.b*0.5, 0.75)))
+			# Color de texto: oscuro si el color es claro, claro si es oscuro
+			var lum := nc.r * 0.299 + nc.g * 0.587 + nc.b * 0.114
+			var fc := Color(0.08, 0.05, 0.03, 1.0) if lum > 0.52 else Color(0.95, 0.92, 0.88, 1.0)
+			btn.add_theme_color_override("font_color",          fc)
+			btn.add_theme_color_override("font_hover_color",    fc)
+			btn.add_theme_color_override("font_pressed_color",  fc)
+			btn.add_theme_color_override("font_disabled_color", Color(fc.r*0.6, fc.g*0.6, fc.b*0.6, 0.8))
 		for child in upgrade_list.get_children():
 			if child is Button:
 				_style_menu_btn(child, tex_menu_n, tex_menu_p)
@@ -262,11 +286,11 @@ func _setup_ui_style() -> void:
 		_tint_panel_labels($UI/HUD/VBox/LayerPanel,  c_rust.darkened(0.50))
 		_tint_panel_labels($UI/HUD/VBox/EnergyPanel, c_copper.darkened(0.50))
 
-		# Íconos HUD — mismo tono oscurecido que el texto del panel
+		# Íconos HUD — más claros que el fondo del panel → se notan bien
 		var tex_coins_icon: Texture2D = load("res://assets/UI/CoinsIcon..png")
 		var tex_depth_icon: Texture2D = load("res://assets/UI/DepthIcon..png")
-		_add_icon_inline(coin_label,  tex_coins_icon, c_brass.darkened(0.50),  20)
-		_add_icon_inline(depth_label, tex_depth_icon, c_steel.darkened(0.50),  18)
+		_add_icon_inline(coin_label,  tex_coins_icon, c_brass.lightened(0.38),  20)
+		_add_icon_inline(depth_label, tex_depth_icon, c_steel.lightened(0.38),  18)
 
 	# Íconos panel de configuración — tono neutro cálido sobre fondo oscuro
 	var tex_config_icon: Texture2D = load("res://assets/UI/ConfigIcon..png")
@@ -275,7 +299,7 @@ func _setup_ui_style() -> void:
 	var settings_tint := Color(0.80, 0.74, 0.62, 1.0)   # latón suave sobre fondo oscuro
 	_add_icon_inline(settings_title_lbl, tex_config_icon, settings_tint, 20)
 	_add_icon_inline(volume_title_lbl,   tex_volume_icon, settings_tint, 16)
-	_add_icon_inline(music_label,                            tex_music_icon,  settings_tint, 14)
+	_add_icon_inline(music_label,        tex_music_icon,  settings_tint, 16)  # mismo tamaño que volumen
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
@@ -441,7 +465,9 @@ func _ready():
 	_setup_ui_style()
 	_setup_font()
 	_refresh_static_ui()
-	depth_ruler.visible = false   # reemplazado por el label de profundidad en el HUD
+	depth_ruler.visible  = false   # reemplazado por el label de profundidad en el HUD
+	master_label.visible = false   # "VOLUME" ya implica master; solo se muestran MUSIC y SFX
+	master_slider.visible= false
 	_play_intro()
 
 # ── Audio ────────────────────────────────────────────────────────────────────
