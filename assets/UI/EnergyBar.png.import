@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://pcwn8k2jnymh"
-path="res://.godot/imported/gearRaw.jpg-09dcb83a2d6c89f1b71e1856d0d5030c.ctex"
+uid="uid://bhtamaixkf8mm"
+path="res://.godot/imported/EnergyBar.png-ded9036b4b1e858b3e516bd68d7b3cda.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/materials/gearRaw.jpg"
-dest_files=["res://.godot/imported/gearRaw.jpg-09dcb83a2d6c89f1b71e1856d0d5030c.ctex"]
+source_file="res://assets/UI/EnergyBar.png"
+dest_files=["res://.godot/imported/EnergyBar.png-ded9036b4b1e858b3e516bd68d7b3cda.ctex"]
 
 [params]
 

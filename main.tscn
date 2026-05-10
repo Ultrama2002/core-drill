@@ -63,7 +63,7 @@ anchor_bottom = 1.0
 offset_left = 8.0
 offset_top = 8.0
 offset_right = -8.0
-offset_bottom = -80.0
+offset_bottom = -100.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -126,14 +126,14 @@ text = "30 / 30"
 
 [node name="EnergyBar" type="ProgressBar" parent="UI/HUD/VBox/EnergyPanel/EnergyVBox" unique_id=400000001]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 10)
+custom_minimum_size = Vector2(0, 14)
 max_value = 100.0
 value = 100.0
 show_percentage = false
 
 [node name="EnergyTimer" type="ProgressBar" parent="UI/HUD/VBox/EnergyPanel/EnergyVBox" unique_id=400000004]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 7)
+custom_minimum_size = Vector2(0, 10)
 max_value = 100.0
 value = 100.0
 show_percentage = false
@@ -149,13 +149,13 @@ layout_mode = 2
 
 [node name="ShopButton" type="Button" parent="UI/HUD/VBox" unique_id=100000011]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 54)
 theme_override_font_sizes/font_size = 13
 text = "SHOP"
 
 [node name="SettingsButton" type="Button" parent="UI/HUD/VBox" unique_id=600000001]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 54)
 theme_override_font_sizes/font_size = 13
 text = "SETTINGS"
 
@@ -166,7 +166,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 6.0
-offset_top = -72.0
+offset_top = -92.0
 offset_right = -6.0
 offset_bottom = -6.0
 grow_horizontal = 2
@@ -228,7 +228,7 @@ theme_override_font_sizes/font_size = 16
 text = "UPGRADES"
 
 [node name="CloseBtn" type="Button" parent="UI/UpgradePanel/Header" unique_id=100000024]
-custom_minimum_size = Vector2(48, 48)
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "X"
@@ -284,7 +284,7 @@ theme_override_font_sizes/font_size = 16
 text = "SETTINGS"
 
 [node name="CloseBtn" type="Button" parent="UI/SettingsPanel/Header" unique_id=600000006]
-custom_minimum_size = Vector2(48, 48)
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "X"
@@ -354,37 +354,37 @@ layout_mode = 2
 
 [node name="BtnEN" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000018]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(64, 52)
 theme_override_font_sizes/font_size = 12
 text = "EN"
 
 [node name="BtnES" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000019]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(64, 52)
 theme_override_font_sizes/font_size = 12
 text = "ES"
 
 [node name="BtnZH" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000020]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(64, 52)
 theme_override_font_sizes/font_size = 12
 text = "ZH"
 
 [node name="BtnPT" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000021]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(64, 52)
 theme_override_font_sizes/font_size = 12
 text = "PT"
 
 [node name="BtnFR" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000022]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(64, 52)
 theme_override_font_sizes/font_size = 12
 text = "FR"
 
 [node name="BtnDE" type="Button" parent="UI/SettingsPanel/Content/LangRow" unique_id=600000023]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(64, 52)
 theme_override_font_sizes/font_size = 12
 text = "DE"
 
@@ -393,7 +393,7 @@ layout_mode = 2
 
 [node name="ExitBtn" type="Button" parent="UI/SettingsPanel/Content" unique_id=600000025]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 56)
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_font_sizes/font_size = 13
 text = "Exit Game"

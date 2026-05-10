@@ -101,8 +101,8 @@ func _setup_hud_panel(panel: PanelContainer, tex: Texture2D, tint: Color) -> voi
 	sb.texture_margin_bottom = 8
 	sb.content_margin_left   = 8
 	sb.content_margin_right  = 8
-	sb.content_margin_top    = 4
-	sb.content_margin_bottom = 4
+	sb.content_margin_top    = 2   # poco espacio arriba → texto sube
+	sb.content_margin_bottom = 14  # espacio extra abajo para la sombra
 	sb.modulate_color        = tint
 	panel.add_theme_stylebox_override("panel", sb)
 
@@ -219,8 +219,8 @@ func _setup_ui_style() -> void:
 		_setup_hud_panel($UI/HUD/VBox/DepthPanel,  tex_coins, Color(0.55, 0.70, 1.00, 1.0))
 		# Layer/taladro — marrón tierra
 		_setup_hud_panel($UI/HUD/VBox/LayerPanel,  tex_coins, Color(0.85, 0.68, 0.45, 1.0))
-		# Energía — verde-cian
-		_setup_hud_panel($UI/HUD/VBox/EnergyPanel, tex_coins, Color(0.40, 0.88, 0.65, 1.0))
+		# Energía — cobre naranja
+		_setup_hud_panel($UI/HUD/VBox/EnergyPanel, tex_coins, Color(0.88, 0.52, 0.18, 1.0))
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
@@ -274,40 +274,40 @@ func _setup_font() -> void:
 	if font == null:
 		return
 
-	# HUD labels (todos via @onready — paths ya actualizados)
-	_fnt(coin_label,       11, font)
-	_fnt(depth_label,       9, font)
-	_fnt(production_label,  8, font)
-	_fnt(layer_label,       8, font)
-	_fnt(drill_label,       8, font)
-	_fnt(energy_label,      8, font)
-	_fnt(next_layer_label,  8, font)
+	# HUD labels
+	_fnt(coin_label,       13, font)
+	_fnt(depth_label,      11, font)
+	_fnt(production_label, 10, font)
+	_fnt(layer_label,      10, font)
+	_fnt(drill_label,      10, font)
+	_fnt(energy_label,     10, font)
+	_fnt(next_layer_label, 10, font)
 
 	# HUD buttons
-	_fnt(tap_button,       10, font)
-	_fnt(shop_button,       8, font)
-	_fnt(settings_button,   8, font)
+	_fnt(tap_button,       13, font)
+	_fnt(shop_button,      10, font)
+	_fnt(settings_button,  10, font)
 
 	# UpgradePanel
-	_fnt($UI/UpgradePanel/Header/TitleLabel, 10, font)
-	_fnt($UI/UpgradePanel/Header/CloseBtn,   10, font)
+	_fnt($UI/UpgradePanel/Header/TitleLabel, 12, font)
+	_fnt($UI/UpgradePanel/Header/CloseBtn,   12, font)
 	for child in upgrade_list.get_children():
 		if child is Button:
-			_fnt(child, 8, font)
+			_fnt(child, 10, font)
 
 	# SettingsPanel
-	_fnt($UI/SettingsPanel/Header/TitleLabel,      10, font)
-	_fnt($UI/SettingsPanel/Header/CloseBtn,        10, font)
-	_fnt($UI/SettingsPanel/Content/VolumeTitle,     9, font)
-	_fnt(master_label,                              8, font)
-	_fnt(music_label,                               8, font)
-	_fnt(sfx_label,                                 8, font)
-	_fnt($UI/SettingsPanel/Content/LangTitle,       9, font)
-	_fnt($UI/SettingsPanel/Content/ExitBtn,         8, font)
+	_fnt($UI/SettingsPanel/Header/TitleLabel,      12, font)
+	_fnt($UI/SettingsPanel/Header/CloseBtn,        12, font)
+	_fnt($UI/SettingsPanel/Content/VolumeTitle,    11, font)
+	_fnt(master_label,                             10, font)
+	_fnt(music_label,                              10, font)
+	_fnt(sfx_label,                                10, font)
+	_fnt($UI/SettingsPanel/Content/LangTitle,      11, font)
+	_fnt($UI/SettingsPanel/Content/ExitBtn,        10, font)
 	for btn_name in ["BtnEN", "BtnES", "BtnZH", "BtnPT", "BtnFR", "BtnDE"]:
 		var btn = $UI/SettingsPanel/Content/LangRow.get_node_or_null(btn_name)
 		if btn:
-			_fnt(btn, 8, font)
+			_fnt(btn, 10, font)
 
 # ── Localization ──────────────────────────────────────────────────────────────
 
@@ -688,7 +688,7 @@ func _build_upgrade_ui():
 	for upgrade in UPGRADES:
 		var btn = Button.new()
 		btn.name = upgrade["id"]
-		btn.custom_minimum_size = Vector2(0, 64)
+		btn.custom_minimum_size = Vector2(0, 76)
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
 		btn.pressed.connect(func(): sfx_blip.play())
 		btn.pressed.connect(_on_upgrade_pressed.bind(upgrade))
