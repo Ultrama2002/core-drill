@@ -24,6 +24,10 @@ var _last_depth: float = 0.0
 var _notified: Dictionary = {}
 var _last_layer_name: String = ""
 
+# ── Intro animation ───────────────────────────────────────────────────────────
+var _intro_playing: bool  = false
+var _intro_depth:   float = 0.0
+
 # ── Translation system (manual CSV parser — no Godot import needed) ───────────
 var _translations: Dictionary = {}   # { "en": { "BTN_DRILL": "DRILL!", ... }, ... }
 var _current_locale: String = "en"
@@ -113,6 +117,26 @@ func _tint_panel_labels(node: Node, color: Color) -> void:
 		if child is Label:
 			child.add_theme_color_override("font_color", color)
 		_tint_panel_labels(child, color)
+
+# Envuelve un Label en HBoxContainer con un TextureRect icono a su izquierda
+func _add_icon_inline(label: Label, tex: Texture2D, tint: Color, icon_px: int = 18) -> void:
+	if tex == null or not is_instance_valid(label):
+		return
+	var parent := label.get_parent()
+	var idx    := label.get_index()
+	var hbox   := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 5)
+	parent.add_child(hbox)
+	parent.move_child(hbox, idx)
+	var tr := TextureRect.new()
+	tr.texture             = tex
+	tr.custom_minimum_size = Vector2(icon_px, icon_px)
+	tr.stretch_mode        = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr.modulate            = tint
+	hbox.add_child(tr)
+	label.reparent(hbox)
+	hbox.move_child(tr, 0)   # ícono siempre antes del texto
 
 func _setup_bar(bar: ProgressBar, fill_color: Color, bg_color: Color, overlay_tex: Texture2D) -> void:
 	# Fondo (zona vacía) — color sólido oscuro
@@ -237,6 +261,21 @@ func _setup_ui_style() -> void:
 		_tint_panel_labels($UI/HUD/VBox/DepthPanel,  c_steel.darkened(0.50))
 		_tint_panel_labels($UI/HUD/VBox/LayerPanel,  c_rust.darkened(0.50))
 		_tint_panel_labels($UI/HUD/VBox/EnergyPanel, c_copper.darkened(0.50))
+
+		# Íconos HUD — mismo tono oscurecido que el texto del panel
+		var tex_coins_icon: Texture2D = load("res://assets/UI/CoinsIcon..png")
+		var tex_depth_icon: Texture2D = load("res://assets/UI/DepthIcon..png")
+		_add_icon_inline(coin_label,  tex_coins_icon, c_brass.darkened(0.50),  20)
+		_add_icon_inline(depth_label, tex_depth_icon, c_steel.darkened(0.50),  18)
+
+	# Íconos panel de configuración — tono neutro cálido sobre fondo oscuro
+	var tex_config_icon: Texture2D = load("res://assets/UI/ConfigIcon..png")
+	var tex_volume_icon: Texture2D = load("res://assets/UI/VolumeIcon..png")
+	var tex_music_icon:  Texture2D = load("res://assets/UI/sprite_png/Music.png")
+	var settings_tint := Color(0.80, 0.74, 0.62, 1.0)   # latón suave sobre fondo oscuro
+	_add_icon_inline($UI/SettingsPanel/Header/TitleLabel,    tex_config_icon, settings_tint, 20)
+	_add_icon_inline($UI/SettingsPanel/Content/VolumeTitle,  tex_volume_icon, settings_tint, 16)
+	_add_icon_inline(music_label,                            tex_music_icon,  settings_tint, 14)
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
@@ -399,6 +438,7 @@ func _ready():
 	_setup_ui_style()
 	_setup_font()
 	_refresh_static_ui()
+	_play_intro()
 
 # ── Audio ────────────────────────────────────────────────────────────────────
 
@@ -677,8 +717,9 @@ func _update_ui():
 
 	_check_notifications()
 	_update_tunnel()
-	world_view.scroll_to(depth)
-	depth_ruler.update(depth)
+	var _scroll_d: float = _intro_depth if _intro_playing else depth
+	world_view.scroll_to(_scroll_d)
+	depth_ruler.update(_scroll_d)
 
 const _TUNNEL_X   := 255.0
 const _TUNNEL_W   := 90.0
@@ -687,7 +728,8 @@ const _DRILL_FOOT := 20.0
 const _PPM        := 2.0
 
 func _update_tunnel():
-	var surface_screen_y: float = _CHAR_Y - depth * _PPM
+	var d: float = _intro_depth if _intro_playing else depth
+	var surface_screen_y: float = _CHAR_Y - d * _PPM
 	var shaft_top: float    = max(0.0, surface_screen_y - 32.0)
 	var shaft_bottom: float = _CHAR_Y + _DRILL_FOOT
 	var shaft_h: float      = max(0.0, shaft_bottom - shaft_top)
@@ -699,6 +741,32 @@ func _get_drill_name() -> String:
 		if upg["type"] == "drill_power" and purchased.get(upg["id"], false):
 			name = upg["name"]
 	return name
+
+func _play_intro() -> void:
+	_intro_playing = true
+	_intro_depth   = 0.0
+
+	# Overlay negro que cubre toda la pantalla (encima de la UI)
+	var overlay := ColorRect.new()
+	overlay.color           = Color(0.0, 0.0, 0.0, 1.0)
+	overlay.layout_mode     = 1
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	overlay.grow_vertical   = Control.GROW_DIRECTION_BOTH
+	overlay.mouse_filter    = Control.MOUSE_FILTER_IGNORE
+	$UI.add_child(overlay)
+
+	var t := create_tween()
+	t.tween_interval(0.35)                         # pausa inicial en negro
+	# Fade a transparente + descenso del "cielo" al taladro — en paralelo
+	t.tween_property(overlay, "color:a", 0.0, 1.1) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.parallel().tween_property(self, "_intro_depth", depth, 2.0) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_callback(func():
+		_intro_playing = false
+		overlay.queue_free()
+	)
 
 func _build_upgrade_ui():
 	for upgrade in UPGRADES:
