@@ -747,28 +747,40 @@ func _get_drill_name() -> String:
 
 func _play_intro() -> void:
 	_intro_playing = true
-	_intro_depth   = 0.0
+	_intro_depth   = -90.0   # "cielo" — bastante por encima de la superficie
 
-	# Overlay negro que cubre toda la pantalla (encima de la UI)
+	# HUD y ruler invisibles durante el viaje
+	$UI/HUD.modulate.a     = 0.0
+	depth_ruler.modulate.a = 0.0
+
+	# Overlay negro en su propia CanvasLayer (encima de todo)
+	var cl := CanvasLayer.new()
+	cl.layer = 10
+	add_child(cl)
 	var overlay := ColorRect.new()
-	overlay.color           = Color(0.0, 0.0, 0.0, 1.0)
-	overlay.layout_mode     = 1
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	overlay.grow_vertical   = Control.GROW_DIRECTION_BOTH
-	overlay.mouse_filter    = Control.MOUSE_FILTER_IGNORE
-	$UI.add_child(overlay)
+	overlay.color    = Color(0.0, 0.0, 0.0, 1.0)
+	overlay.position = Vector2.ZERO
+	overlay.size     = get_viewport_rect().size
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cl.add_child(overlay)
 
 	var t := create_tween()
-	t.tween_interval(0.35)                         # pausa inicial en negro
-	# Fade a transparente + descenso del "cielo" al taladro — en paralelo
-	t.tween_property(overlay, "color:a", 0.0, 1.1) \
+	t.tween_interval(0.4)                          # pausa inicial en negro
+	# Fade del overlay + descenso desde el cielo — en paralelo
+	t.tween_property(overlay, "color:a", 0.0, 0.9) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	t.parallel().tween_property(self, "_intro_depth", depth, 2.0) \
+	t.parallel().tween_property(self, "_intro_depth", depth, 2.3) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# Al llegar al taladro: limpiar overlay y hacer aparecer el HUD
 	t.tween_callback(func():
 		_intro_playing = false
-		overlay.queue_free()
+		cl.queue_free()
+		var t2 := create_tween()
+		t2.set_parallel(true)
+		t2.tween_property($UI/HUD,   "modulate:a", 1.0, 0.45) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t2.tween_property(depth_ruler, "modulate:a", 1.0, 0.45) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	)
 
 func _build_upgrade_ui():
