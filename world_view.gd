@@ -1,7 +1,7 @@
 extends Node2D
 
 const PIXELS_PER_METER := 2.0
-const CHARACTER_SCREEN_Y := 340.0
+const CHARACTER_SCREEN_Y := 400.0
 const RARE_MISS_MARGIN := 180.0
 
 signal rare_collected(mat_id: String, coin_value: int)

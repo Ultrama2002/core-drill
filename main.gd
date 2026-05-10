@@ -441,6 +441,7 @@ func _ready():
 	_setup_ui_style()
 	_setup_font()
 	_refresh_static_ui()
+	depth_ruler.visible = false   # reemplazado por el label de profundidad en el HUD
 	_play_intro()
 
 # ── Audio ────────────────────────────────────────────────────────────────────
@@ -722,7 +723,6 @@ func _update_ui():
 	_update_tunnel()
 	var _scroll_d: float = _intro_depth if _intro_playing else depth
 	world_view.scroll_to(_scroll_d)
-	depth_ruler.update(_scroll_d)
 
 const _TUNNEL_X   := 255.0
 const _TUNNEL_W   := 90.0
@@ -749,12 +749,12 @@ func _play_intro() -> void:
 	_intro_playing = true
 	_intro_depth   = -250.0  # "cielo" — muy por encima, solo se ve el fondo de cielo
 
-	# Ocultar: contenido del HUD (no el fondo SideMenu), ruler y el taladro
+	# Ocultar: contenido del HUD (no el fondo SideMenu), taladro y túnel
 	# → el panel derecho queda como un marco vacío, sin el gap gris del clear color
-	$UI/HUD/VBox.modulate.a  = 0.0
-	tap_button.modulate.a    = 0.0
-	depth_ruler.modulate.a   = 0.0
-	drill_char.modulate.a    = 0.0
+	$UI/HUD/VBox.modulate.a      = 0.0
+	tap_button.modulate.a        = 0.0
+	drill_char.modulate.a        = 0.0
+	tunnel_shaft.modulate.a      = 0.0
 
 	# Overlay negro en su propia CanvasLayer (encima de todo)
 	var cl := CanvasLayer.new()
@@ -782,11 +782,11 @@ func _play_intro() -> void:
 		t2.set_parallel(true)
 		t2.tween_property(drill_char,      "modulate:a", 1.0, 0.35) \
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t2.tween_property(tunnel_shaft,    "modulate:a", 1.0, 0.45) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		t2.tween_property($UI/HUD/VBox,    "modulate:a", 1.0, 0.45) \
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		t2.tween_property(tap_button,      "modulate:a", 1.0, 0.45) \
-			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		t2.tween_property(depth_ruler,     "modulate:a", 1.0, 0.45) \
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	)
 
