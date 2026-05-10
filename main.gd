@@ -17,7 +17,7 @@ var purchased: Dictionary = {}
 
 const BASE_DROP_INTERVAL := 12.0
 const DROP_DEPTH_SCALE   := 0.018
-const RARE_THRESHOLD := 3
+const RARE_THRESHOLD := 2
 
 var _drop_acc: float = 0.0
 var _last_depth: float = 0.0
@@ -600,7 +600,7 @@ func _give_material():
 			var cv: int = int(mat.get("coin_value", 1))
 			if rarity >= RARE_THRESHOLD:
 				var spawn_depth = depth + randf_range(30, 100)
-				world_view.spawn_rare_clickable(mid, _symbol_for(mid), rarity, cv, spawn_depth)
+				world_view.spawn_rare_clickable(mid, _symbol_for(mid), rarity, cv, spawn_depth, _sprite_for(mid))
 			else:
 				coins += cv
 				_spawn_float("%s +%d" % [_symbol_for(mid), cv])
@@ -875,6 +875,10 @@ func _on_upgrade_pressed(upgrade: Dictionary):
 func _symbol_for(mat_id: String) -> String:
 	var mat = _get_mat(mat_id)
 	return mat["symbol"] if mat else "?"
+
+func _sprite_for(mat_id: String) -> String:
+	var mat = _get_mat(mat_id)
+	return mat.get("sprite", "") if mat else ""
 
 func _get_mat(mat_id: String):
 	for mat in MATERIALS:

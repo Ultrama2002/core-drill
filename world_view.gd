@@ -51,29 +51,42 @@ func setup(layers: Array):
 func scroll_to(depth: float):
 	position.y = -depth * PIXELS_PER_METER + CHARACTER_SCREEN_Y
 
-func spawn_rare_clickable(mat_id: String, symbol: String, rarity: int, coin_value: int, trigger_depth: float):
+func spawn_rare_clickable(mat_id: String, symbol: String, rarity: int, coin_value: int, trigger_depth: float, sprite_path: String = ""):
 	var container = Node2D.new()
-	container.position = Vector2(randf_range(80, 520), trigger_depth * PIXELS_PER_METER)
+	container.position = Vector2(randf_range(60, 500), trigger_depth * PIXELS_PER_METER)
 
-	var sz = float(24 + rarity * 5)
-	var glow = ColorRect.new()
-	glow.size = Vector2(sz, sz)
+	var sz := float(28 + rarity * 4)
+
+	# Brillo de fondo — más intenso cuanto mayor la rareza
+	var glow := ColorRect.new()
+	glow.size     = Vector2(sz, sz)
 	glow.position = Vector2(-sz * 0.5, -sz * 0.5)
-	glow.color = Color(1.0, 0.85, 0.1, 0.20 + rarity * 0.06)
+	glow.color    = Color(1.0, 0.85, 0.1, 0.15 + rarity * 0.05)
 	container.add_child(glow)
 
-	var lbl = Label.new()
-	lbl.text = symbol
-	lbl.add_theme_font_size_override("font_size", 20 + rarity * 2)
-	lbl.add_theme_color_override("font_color", Color(1, 1, 1, 1))
-	lbl.position = Vector2(-11, -13)
-	container.add_child(lbl)
+	# Sprite PNG si existe, símbolo de texto como fallback
+	if sprite_path != "" and ResourceLoader.exists(sprite_path):
+		var tex: Texture2D = load(sprite_path)
+		var tr := TextureRect.new()
+		tr.texture      = tex
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tr.size         = Vector2(sz, sz)
+		tr.position     = Vector2(-sz * 0.5, -sz * 0.5)
+		container.add_child(tr)
+	else:
+		var lbl := Label.new()
+		lbl.text = symbol
+		lbl.add_theme_font_size_override("font_size", 18 + rarity * 2)
+		lbl.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+		lbl.position = Vector2(-11, -13)
+		container.add_child(lbl)
 
-	var coins_lbl = Label.new()
+	# Valor en monedas
+	var coins_lbl := Label.new()
 	coins_lbl.text = "+%d" % coin_value
-	coins_lbl.add_theme_font_size_override("font_size", 10)
+	coins_lbl.add_theme_font_size_override("font_size", 9)
 	coins_lbl.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3, 0.9))
-	coins_lbl.position = Vector2(-8, 10)
+	coins_lbl.position = Vector2(-sz * 0.3, sz * 0.5 + 2.0)
 	container.add_child(coins_lbl)
 
 	var t = container.create_tween().set_loops()
