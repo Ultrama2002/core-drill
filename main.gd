@@ -273,8 +273,8 @@ func _setup_ui_style() -> void:
 	var tex_volume_icon: Texture2D = load("res://assets/UI/VolumeIcon..png")
 	var tex_music_icon:  Texture2D = load("res://assets/UI/sprite_png/Music.png")
 	var settings_tint := Color(0.80, 0.74, 0.62, 1.0)   # latón suave sobre fondo oscuro
-	_add_icon_inline($UI/SettingsPanel/Header/TitleLabel,    tex_config_icon, settings_tint, 20)
-	_add_icon_inline($UI/SettingsPanel/Content/VolumeTitle,  tex_volume_icon, settings_tint, 16)
+	_add_icon_inline(settings_title_lbl, tex_config_icon, settings_tint, 20)
+	_add_icon_inline(volume_title_lbl,   tex_volume_icon, settings_tint, 16)
 	_add_icon_inline(music_label,                            tex_music_icon,  settings_tint, 14)
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
@@ -351,9 +351,9 @@ func _setup_font() -> void:
 			_fnt(child, 10, font)
 
 	# SettingsPanel
-	_fnt($UI/SettingsPanel/Header/TitleLabel,      12, font)
+	_fnt(settings_title_lbl,                       12, font)
 	_fnt($UI/SettingsPanel/Header/CloseBtn,        12, font)
-	_fnt($UI/SettingsPanel/Content/VolumeTitle,    11, font)
+	_fnt(volume_title_lbl,                         11, font)
 	_fnt(master_label,                             10, font)
 	_fnt(music_label,                              10, font)
 	_fnt(sfx_label,                                10, font)
@@ -371,10 +371,10 @@ func _refresh_static_ui() -> void:
 	shop_button.text     = _tr("BTN_SHOP")
 	settings_button.text = _tr("BTN_SETTINGS")
 	$UI/SettingsPanel/Content/ExitBtn.text             = _tr("BTN_EXIT")
-	$UI/UpgradePanel/Header/TitleLabel.text             = _tr("TITLE_UPGRADES")
-	$UI/SettingsPanel/Header/TitleLabel.text            = _tr("TITLE_SETTINGS")
-	$UI/SettingsPanel/Content/VolumeTitle.text          = _tr("SETTINGS_VOLUME")
-	$UI/SettingsPanel/Content/LangTitle.text            = _tr("SETTINGS_LANG")
+	$UI/UpgradePanel/Header/TitleLabel.text  = _tr("TITLE_UPGRADES")
+	settings_title_lbl.text                  = _tr("TITLE_SETTINGS")
+	volume_title_lbl.text                    = _tr("SETTINGS_VOLUME")
+	$UI/SettingsPanel/Content/LangTitle.text = _tr("SETTINGS_LANG")
 	master_label.text = _tr("VOL_MASTER").format([int(master_slider.value)])
 	music_label.text  = _tr("VOL_MUSIC").format([int(music_slider.value)])
 	sfx_label.text    = _tr("VOL_SFX").format([int(sfx_slider.value)])
@@ -413,13 +413,16 @@ func _set_lang(locale: String) -> void:
 @onready var music_slider     = $UI/SettingsPanel/Content/MusicSlider
 @onready var sfx_label        = $UI/SettingsPanel/Content/SFXLabel
 @onready var sfx_slider       = $UI/SettingsPanel/Content/SFXSlider
-@onready var upgrade_list     = $UI/UpgradePanel/ScrollContainer/UpgradeList
-@onready var tap_button       = $UI/HUD/TapButton
-@onready var shop_button      = $UI/HUD/VBox/ShopButton
-@onready var upgrade_panel    = $UI/UpgradePanel
-@onready var depth_ruler      = $UI/DepthRuler
-@onready var notif_label      = $UI/NotifBanner/NotifLabel
-@onready var tunnel_shaft     = $TunnelLayer/TunnelShaft
+@onready var upgrade_list        = $UI/UpgradePanel/ScrollContainer/UpgradeList
+@onready var tap_button          = $UI/HUD/TapButton
+@onready var shop_button         = $UI/HUD/VBox/ShopButton
+@onready var upgrade_panel       = $UI/UpgradePanel
+@onready var depth_ruler         = $UI/DepthRuler
+@onready var notif_label         = $UI/NotifBanner/NotifLabel
+@onready var tunnel_shaft        = $TunnelLayer/TunnelShaft
+# Cacheados aquí porque _add_icon_inline los reparenta y el path deja de funcionar
+@onready var settings_title_lbl  = $UI/SettingsPanel/Header/TitleLabel
+@onready var volume_title_lbl    = $UI/SettingsPanel/Content/VolumeTitle
 
 func _ready():
 	_load_translations()
