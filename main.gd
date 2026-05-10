@@ -749,18 +749,21 @@ func _play_intro() -> void:
 	_intro_playing = true
 	_intro_depth   = -250.0  # "cielo" — muy por encima, solo se ve el fondo de cielo
 
-	# HUD y ruler invisibles durante el viaje
-	$UI/HUD.modulate.a     = 0.0
-	depth_ruler.modulate.a = 0.0
+	# Ocultar: contenido del HUD (no el fondo SideMenu), ruler y el taladro
+	# → el panel derecho queda como un marco vacío, sin el gap gris del clear color
+	$UI/HUD/VBox.modulate.a  = 0.0
+	tap_button.modulate.a    = 0.0
+	depth_ruler.modulate.a   = 0.0
+	drill_char.modulate.a    = 0.0
 
 	# Overlay negro en su propia CanvasLayer (encima de todo)
 	var cl := CanvasLayer.new()
 	cl.layer = 10
 	add_child(cl)
 	var overlay := ColorRect.new()
-	overlay.color    = Color(0.0, 0.0, 0.0, 1.0)
-	overlay.position = Vector2.ZERO
-	overlay.size     = get_viewport_rect().size
+	overlay.color        = Color(0.0, 0.0, 0.0, 1.0)
+	overlay.position     = Vector2.ZERO
+	overlay.size         = get_viewport_rect().size
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cl.add_child(overlay)
 
@@ -771,15 +774,19 @@ func _play_intro() -> void:
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t.parallel().tween_property(self, "_intro_depth", depth, 4.3) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	# Al llegar al taladro: limpiar overlay y hacer aparecer el HUD
+	# Al llegar al taladro: taladro aparece + contenido HUD hace fade in
 	t.tween_callback(func():
 		_intro_playing = false
 		cl.queue_free()
 		var t2 := create_tween()
 		t2.set_parallel(true)
-		t2.tween_property($UI/HUD,   "modulate:a", 1.0, 0.45) \
+		t2.tween_property(drill_char,      "modulate:a", 1.0, 0.35) \
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		t2.tween_property(depth_ruler, "modulate:a", 1.0, 0.45) \
+		t2.tween_property($UI/HUD/VBox,    "modulate:a", 1.0, 0.45) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t2.tween_property(tap_button,      "modulate:a", 1.0, 0.45) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t2.tween_property(depth_ruler,     "modulate:a", 1.0, 0.45) \
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	)
 
