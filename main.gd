@@ -193,6 +193,21 @@ func _setup_ui_style() -> void:
 	_setup_bar(energy_bar,  Color(0.15, 0.88, 0.28, 1.0), Color(0.04, 0.18, 0.07, 0.9), tex_ebar)
 	_setup_bar(energy_timer, Color(1.00, 0.82, 0.08, 1.0), Color(0.18, 0.14, 0.03, 0.9), tex_rebar)
 
+	# ── Frame de monedas (9-slice) ────────────────────────────────────────────
+	var tex_coins: Texture2D = load("res://assets/UI/Coins.png")
+	if tex_coins:
+		var sb := StyleBoxTexture.new()
+		sb.texture               = tex_coins
+		sb.texture_margin_left   = 8
+		sb.texture_margin_right  = 8
+		sb.texture_margin_top    = 8
+		sb.texture_margin_bottom = 8
+		sb.content_margin_left   = 8
+		sb.content_margin_right  = 8
+		sb.content_margin_top    = 4
+		sb.content_margin_bottom = 4
+		$UI/HUD/VBox/CoinPanel.add_theme_stylebox_override("panel", sb)
+
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
 
@@ -246,7 +261,7 @@ func _setup_font() -> void:
 		return
 
 	# HUD labels
-	_fnt(coin_label,       11, font)
+	_fnt(coin_label,       11, font)   # path actualizado via @onready
 	_fnt(depth_label,       9, font)
 	_fnt(production_label,  8, font)
 	_fnt(layer_label,       8, font)
@@ -312,7 +327,7 @@ func _set_lang(locale: String) -> void:
 @onready var world_view       = $WorldView
 @onready var drill_char       = $DrillLayer/DrillChar
 @onready var float_container  = $FloatContainer
-@onready var coin_label       = $UI/HUD/VBox/CoinLabel
+@onready var coin_label       = $UI/HUD/VBox/CoinPanel/CoinLabel
 @onready var depth_label      = $UI/HUD/VBox/DepthLabel
 @onready var production_label = $UI/HUD/VBox/ProductionLabel
 @onready var layer_label      = $UI/HUD/VBox/LayerLabel

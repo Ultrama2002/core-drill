@@ -67,7 +67,10 @@ offset_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CoinLabel" type="Label" parent="UI/HUD/VBox" unique_id=300000010]
+[node name="CoinPanel" type="PanelContainer" parent="UI/HUD/VBox" unique_id=910000001]
+layout_mode = 2
+
+[node name="CoinLabel" type="Label" parent="UI/HUD/VBox/CoinPanel" unique_id=300000010]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
 theme_override_font_sizes/font_size = 20
