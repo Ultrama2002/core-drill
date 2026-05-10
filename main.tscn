@@ -76,64 +76,73 @@ theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
 theme_override_font_sizes/font_size = 20
 text = "0"
 
-[node name="Sep1" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000020]
+[node name="DepthPanel" type="PanelContainer" parent="UI/HUD/VBox" unique_id=920000001]
 layout_mode = 2
 
-[node name="DepthLabel" type="Label" parent="UI/HUD/VBox" unique_id=1166273215]
+[node name="DepthVBox" type="VBoxContainer" parent="UI/HUD/VBox/DepthPanel" unique_id=920000002]
+layout_mode = 2
+
+[node name="DepthLabel" type="Label" parent="UI/HUD/VBox/DepthPanel/DepthVBox" unique_id=1166273215]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "0.0 m"
 
-[node name="ProductionLabel" type="Label" parent="UI/HUD/VBox" unique_id=454812224]
+[node name="ProductionLabel" type="Label" parent="UI/HUD/VBox/DepthPanel/DepthVBox" unique_id=454812224]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 1, 0.6, 1)
 theme_override_font_sizes/font_size = 12
 text = "0.0 m/s"
 
-[node name="Sep2" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000021]
+[node name="LayerPanel" type="PanelContainer" parent="UI/HUD/VBox" unique_id=930000001]
 layout_mode = 2
 
-[node name="LayerLabel" type="Label" parent="UI/HUD/VBox" unique_id=200000010]
+[node name="LayerVBox" type="VBoxContainer" parent="UI/HUD/VBox/LayerPanel" unique_id=930000002]
+layout_mode = 2
+
+[node name="LayerLabel" type="Label" parent="UI/HUD/VBox/LayerPanel/LayerVBox" unique_id=200000010]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
 theme_override_font_sizes/font_size = 11
 text = "Topsoil"
 
-[node name="DrillLabel" type="Label" parent="UI/HUD/VBox" unique_id=200000011]
+[node name="DrillLabel" type="Label" parent="UI/HUD/VBox/LayerPanel/LayerVBox" unique_id=200000011]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 11
 text = "Basic Drill"
 
-[node name="Sep_nrg" type="HSeparator" parent="UI/HUD/VBox" unique_id=400000003]
+[node name="EnergyPanel" type="PanelContainer" parent="UI/HUD/VBox" unique_id=940000001]
 layout_mode = 2
 
-[node name="EnergyLabel" type="Label" parent="UI/HUD/VBox" unique_id=400000002]
+[node name="EnergyVBox" type="VBoxContainer" parent="UI/HUD/VBox/EnergyPanel" unique_id=940000002]
+layout_mode = 2
+
+[node name="EnergyLabel" type="Label" parent="UI/HUD/VBox/EnergyPanel/EnergyVBox" unique_id=400000002]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 1.0, 1)
 theme_override_font_sizes/font_size = 11
 text = "30 / 30"
 
-[node name="EnergyBar" type="ProgressBar" parent="UI/HUD/VBox" unique_id=400000001]
+[node name="EnergyBar" type="ProgressBar" parent="UI/HUD/VBox/EnergyPanel/EnergyVBox" unique_id=400000001]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 10)
 max_value = 100.0
 value = 100.0
 show_percentage = false
 
-[node name="EnergyTimer" type="ProgressBar" parent="UI/HUD/VBox" unique_id=400000004]
+[node name="EnergyTimer" type="ProgressBar" parent="UI/HUD/VBox/EnergyPanel/EnergyVBox" unique_id=400000004]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 7)
 max_value = 100.0
 value = 100.0
 show_percentage = false
 
-[node name="NextLayerLabel" type="Label" parent="UI/HUD/VBox" unique_id=800000001]
+[node name="NextLayerLabel" type="Label" parent="UI/HUD/VBox/EnergyPanel/EnergyVBox" unique_id=800000001]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 1.0, 0.55, 1)
 theme_override_font_sizes/font_size = 10
-text = "▼  - m"
+text = "- m"
 
 [node name="Sep3" type="HSeparator" parent="UI/HUD/VBox" unique_id=300000022]
 layout_mode = 2

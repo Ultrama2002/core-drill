@@ -92,6 +92,20 @@ func _style_danger_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
 	btn.add_theme_color_override("font_pressed_color",  Color(0.90, 0.90, 0.90, 1.0))
 	btn.add_theme_color_override("font_disabled_color", Color(0.70, 0.58, 0.58, 0.9))
 
+func _setup_hud_panel(panel: PanelContainer, tex: Texture2D, tint: Color) -> void:
+	var sb := StyleBoxTexture.new()
+	sb.texture               = tex
+	sb.texture_margin_left   = 8
+	sb.texture_margin_right  = 8
+	sb.texture_margin_top    = 8
+	sb.texture_margin_bottom = 8
+	sb.content_margin_left   = 8
+	sb.content_margin_right  = 8
+	sb.content_margin_top    = 4
+	sb.content_margin_bottom = 4
+	sb.modulate_color        = tint
+	panel.add_theme_stylebox_override("panel", sb)
+
 func _setup_bar(bar: ProgressBar, fill_color: Color, bg_color: Color, overlay_tex: Texture2D) -> void:
 	# Fondo (zona vacía) — color sólido oscuro
 	var bg_sb := StyleBoxFlat.new()
@@ -111,17 +125,20 @@ func _setup_bar(bar: ProgressBar, fill_color: Color, bg_color: Color, overlay_te
 	fill_sb.corner_radius_bottom_right = 3
 	bar.add_theme_stylebox_override("fill", fill_sb)
 
-	# PNG encima como overlay decorativo (transparente en el centro)
+	# NinePatchRect encima como overlay — sin deformación
 	if overlay_tex:
-		var tr := TextureRect.new()
-		tr.texture      = overlay_tex
-		tr.layout_mode  = 1
-		tr.set_anchors_preset(Control.PRESET_FULL_RECT)
-		tr.grow_horizontal = Control.GROW_DIRECTION_BOTH
-		tr.grow_vertical   = Control.GROW_DIRECTION_BOTH
-		tr.stretch_mode    = TextureRect.STRETCH_SCALE
-		tr.mouse_filter    = Control.MOUSE_FILTER_IGNORE
-		bar.add_child(tr)
+		var np := NinePatchRect.new()
+		np.texture              = overlay_tex
+		np.patch_margin_left    = 6
+		np.patch_margin_right   = 6
+		np.patch_margin_top     = 3
+		np.patch_margin_bottom  = 3
+		np.layout_mode          = 1
+		np.set_anchors_preset(Control.PRESET_FULL_RECT)
+		np.grow_horizontal      = Control.GROW_DIRECTION_BOTH
+		np.grow_vertical        = Control.GROW_DIRECTION_BOTH
+		np.mouse_filter         = Control.MOUSE_FILTER_IGNORE
+		bar.add_child(np)
 
 func _apply_menu_bg(panel: Control, tex: Texture2D) -> void:
 	# Oculta el ColorRect "BG" hijo si existe (paneles deslizantes)
@@ -193,20 +210,17 @@ func _setup_ui_style() -> void:
 	_setup_bar(energy_bar,  Color(0.15, 0.88, 0.28, 1.0), Color(0.04, 0.18, 0.07, 0.9), tex_ebar)
 	_setup_bar(energy_timer, Color(1.00, 0.82, 0.08, 1.0), Color(0.18, 0.14, 0.03, 0.9), tex_rebar)
 
-	# ── Frame de monedas (9-slice) ────────────────────────────────────────────
+	# ── Frames del HUD (9-slice con Coins.png tintado por sección) ───────────
 	var tex_coins: Texture2D = load("res://assets/UI/Coins.png")
 	if tex_coins:
-		var sb := StyleBoxTexture.new()
-		sb.texture               = tex_coins
-		sb.texture_margin_left   = 8
-		sb.texture_margin_right  = 8
-		sb.texture_margin_top    = 8
-		sb.texture_margin_bottom = 8
-		sb.content_margin_left   = 8
-		sb.content_margin_right  = 8
-		sb.content_margin_top    = 4
-		sb.content_margin_bottom = 4
-		$UI/HUD/VBox/CoinPanel.add_theme_stylebox_override("panel", sb)
+		# Monedas — dorado
+		_setup_hud_panel($UI/HUD/VBox/CoinPanel,   tex_coins, Color(1.00, 0.85, 0.40, 1.0))
+		# Profundidad/velocidad — azul frío
+		_setup_hud_panel($UI/HUD/VBox/DepthPanel,  tex_coins, Color(0.55, 0.70, 1.00, 1.0))
+		# Layer/taladro — marrón tierra
+		_setup_hud_panel($UI/HUD/VBox/LayerPanel,  tex_coins, Color(0.85, 0.68, 0.45, 1.0))
+		# Energía — verde-cian
+		_setup_hud_panel($UI/HUD/VBox/EnergyPanel, tex_coins, Color(0.40, 0.88, 0.65, 1.0))
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
@@ -260,8 +274,8 @@ func _setup_font() -> void:
 	if font == null:
 		return
 
-	# HUD labels
-	_fnt(coin_label,       11, font)   # path actualizado via @onready
+	# HUD labels (todos via @onready — paths ya actualizados)
+	_fnt(coin_label,       11, font)
 	_fnt(depth_label,       9, font)
 	_fnt(production_label,  8, font)
 	_fnt(layer_label,       8, font)
@@ -328,14 +342,14 @@ func _set_lang(locale: String) -> void:
 @onready var drill_char       = $DrillLayer/DrillChar
 @onready var float_container  = $FloatContainer
 @onready var coin_label       = $UI/HUD/VBox/CoinPanel/CoinLabel
-@onready var depth_label      = $UI/HUD/VBox/DepthLabel
-@onready var production_label = $UI/HUD/VBox/ProductionLabel
-@onready var layer_label      = $UI/HUD/VBox/LayerLabel
-@onready var drill_label      = $UI/HUD/VBox/DrillLabel
-@onready var energy_label     = $UI/HUD/VBox/EnergyLabel
-@onready var energy_bar       = $UI/HUD/VBox/EnergyBar
-@onready var energy_timer     = $UI/HUD/VBox/EnergyTimer
-@onready var next_layer_label = $UI/HUD/VBox/NextLayerLabel
+@onready var depth_label      = $UI/HUD/VBox/DepthPanel/DepthVBox/DepthLabel
+@onready var production_label = $UI/HUD/VBox/DepthPanel/DepthVBox/ProductionLabel
+@onready var layer_label      = $UI/HUD/VBox/LayerPanel/LayerVBox/LayerLabel
+@onready var drill_label      = $UI/HUD/VBox/LayerPanel/LayerVBox/DrillLabel
+@onready var energy_label     = $UI/HUD/VBox/EnergyPanel/EnergyVBox/EnergyLabel
+@onready var energy_bar       = $UI/HUD/VBox/EnergyPanel/EnergyVBox/EnergyBar
+@onready var energy_timer     = $UI/HUD/VBox/EnergyPanel/EnergyVBox/EnergyTimer
+@onready var next_layer_label = $UI/HUD/VBox/EnergyPanel/EnergyVBox/NextLayerLabel
 @onready var settings_button  = $UI/HUD/VBox/SettingsButton
 @onready var settings_panel   = $UI/SettingsPanel
 @onready var master_label     = $UI/SettingsPanel/Content/MasterLabel
