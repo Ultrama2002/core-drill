@@ -72,25 +72,26 @@ func _make_sb(tex: Texture2D, margin: int, tint: Color) -> StyleBoxTexture:
 	return sb
 
 func _style_menu_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
-	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.40, 1.35, 1.25, 1.0)))
-	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.65, 1.60, 1.50, 1.0)))
-	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(1.10, 1.05, 1.00, 1.0)))
-	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.60, 0.55, 0.50, 0.75)))
-	btn.add_theme_color_override("font_color",          Color(0.08, 0.05, 0.03, 1.0))
-	btn.add_theme_color_override("font_hover_color",    Color(0.04, 0.04, 0.08, 1.0))
-	btn.add_theme_color_override("font_pressed_color",  Color(0.00, 0.00, 0.00, 1.0))
-	btn.add_theme_color_override("font_disabled_color", Color(0.38, 0.33, 0.28, 0.9))
+	# Acero gastado — tono cálido grisáceo, coherente con paleta industrial
+	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(0.88, 0.82, 0.72, 1.0)))
+	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.02, 0.96, 0.84, 1.0)))
+	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(0.72, 0.66, 0.58, 1.0)))
+	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.48, 0.44, 0.40, 0.75)))
+	btn.add_theme_color_override("font_color",          Color(0.13, 0.10, 0.06, 1.0))
+	btn.add_theme_color_override("font_hover_color",    Color(0.08, 0.06, 0.04, 1.0))
+	btn.add_theme_color_override("font_pressed_color",  Color(0.05, 0.03, 0.01, 1.0))
+	btn.add_theme_color_override("font_disabled_color", Color(0.38, 0.34, 0.30, 0.9))
 
 func _style_danger_btn(btn: Button, tex_n: Texture2D, tex_p: Texture2D) -> void:
-	# Rojo desaturado (ladrillo) para Exit y botones de cerrar
-	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(1.05, 0.52, 0.52, 1.0)))
-	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(1.20, 0.62, 0.62, 1.0)))
-	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(0.82, 0.38, 0.38, 1.0)))
-	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.55, 0.40, 0.40, 0.75)))
-	btn.add_theme_color_override("font_color",          Color(1.00, 1.00, 1.00, 1.0))
-	btn.add_theme_color_override("font_hover_color",    Color(1.00, 1.00, 1.00, 1.0))
-	btn.add_theme_color_override("font_pressed_color",  Color(0.90, 0.90, 0.90, 1.0))
-	btn.add_theme_color_override("font_disabled_color", Color(0.70, 0.58, 0.58, 0.9))
+	# Señal de peligro industrial — rojo ladrillo muy desaturado
+	btn.add_theme_stylebox_override("normal",   _make_sb(tex_n, 10, Color(0.82, 0.40, 0.32, 1.0)))
+	btn.add_theme_stylebox_override("hover",    _make_sb(tex_n, 10, Color(0.96, 0.48, 0.38, 1.0)))
+	btn.add_theme_stylebox_override("pressed",  _make_sb(tex_p, 10, Color(0.64, 0.30, 0.24, 1.0)))
+	btn.add_theme_stylebox_override("disabled", _make_sb(tex_n, 10, Color(0.44, 0.30, 0.28, 0.75)))
+	btn.add_theme_color_override("font_color",          Color(0.92, 0.84, 0.82, 1.0))
+	btn.add_theme_color_override("font_hover_color",    Color(0.98, 0.92, 0.90, 1.0))
+	btn.add_theme_color_override("font_pressed_color",  Color(0.85, 0.76, 0.74, 1.0))
+	btn.add_theme_color_override("font_disabled_color", Color(0.55, 0.46, 0.44, 0.9))
 
 func _setup_hud_panel(panel: PanelContainer, tex: Texture2D, tint: Color) -> void:
 	var sb := StyleBoxTexture.new()
@@ -101,10 +102,17 @@ func _setup_hud_panel(panel: PanelContainer, tex: Texture2D, tint: Color) -> voi
 	sb.texture_margin_bottom = 8
 	sb.content_margin_left   = 8
 	sb.content_margin_right  = 8
-	sb.content_margin_top    = 2   # poco espacio arriba → texto sube
-	sb.content_margin_bottom = 14  # espacio extra abajo para la sombra
+	sb.content_margin_top    = 4   # +2px respecto al anterior → texto un poco más abajo
+	sb.content_margin_bottom = 12  # sombra compensada
 	sb.modulate_color        = tint
 	panel.add_theme_stylebox_override("panel", sb)
+
+# Recorre recursivamente un nodo y tinta todos los Labels con el color dado
+func _tint_panel_labels(node: Node, color: Color) -> void:
+	for child in node.get_children():
+		if child is Label:
+			child.add_theme_color_override("font_color", color)
+		_tint_panel_labels(child, color)
 
 func _setup_bar(bar: ProgressBar, fill_color: Color, bg_color: Color, overlay_tex: Texture2D) -> void:
 	# Fondo (zona vacía) — color sólido oscuro
@@ -213,14 +221,22 @@ func _setup_ui_style() -> void:
 	# ── Frames del HUD (9-slice con Coins.png tintado por sección) ───────────
 	var tex_coins: Texture2D = load("res://assets/UI/Coins.png")
 	if tex_coins:
-		# Monedas — dorado
-		_setup_hud_panel($UI/HUD/VBox/CoinPanel,   tex_coins, Color(1.00, 0.85, 0.40, 1.0))
-		# Profundidad/velocidad — azul frío
-		_setup_hud_panel($UI/HUD/VBox/DepthPanel,  tex_coins, Color(0.55, 0.70, 1.00, 1.0))
-		# Layer/taladro — marrón tierra
-		_setup_hud_panel($UI/HUD/VBox/LayerPanel,  tex_coins, Color(0.85, 0.68, 0.45, 1.0))
-		# Energía — cobre naranja
-		_setup_hud_panel($UI/HUD/VBox/EnergyPanel, tex_coins, Color(0.88, 0.52, 0.18, 1.0))
+		# Paleta industrial: latón envejecido / acero pizarra / óxido / cobre gastado
+		var c_brass  := Color(0.82, 0.66, 0.30, 1.0)   # latón — panel monedas
+		var c_steel  := Color(0.48, 0.58, 0.72, 1.0)   # acero pizarra — panel profundidad
+		var c_rust   := Color(0.70, 0.50, 0.32, 1.0)   # óxido hierro — panel capa
+		var c_copper := Color(0.78, 0.44, 0.20, 1.0)   # cobre gastado — panel energía
+
+		_setup_hud_panel($UI/HUD/VBox/CoinPanel,   tex_coins, c_brass)
+		_setup_hud_panel($UI/HUD/VBox/DepthPanel,  tex_coins, c_steel)
+		_setup_hud_panel($UI/HUD/VBox/LayerPanel,  tex_coins, c_rust)
+		_setup_hud_panel($UI/HUD/VBox/EnergyPanel, tex_coins, c_copper)
+
+		# Texto = color de base del panel oscurecido ~50% → misma familia de tono, sin contraste agresivo
+		_tint_panel_labels($UI/HUD/VBox/CoinPanel,   c_brass.darkened(0.50))
+		_tint_panel_labels($UI/HUD/VBox/DepthPanel,  c_steel.darkened(0.50))
+		_tint_panel_labels($UI/HUD/VBox/LayerPanel,  c_rust.darkened(0.50))
+		_tint_panel_labels($UI/HUD/VBox/EnergyPanel, c_copper.darkened(0.50))
 
 	# ── Sliders de volumen ────────────────────────────────────────────────────
 	_setup_sliders()
@@ -244,17 +260,17 @@ func _setup_sliders() -> void:
 			track_sb.texture_margin_right  = 6
 			track_sb.texture_margin_top    = 6
 			track_sb.texture_margin_bottom = 6
-			track_sb.modulate_color        = Color(0.55, 0.52, 0.48, 1.0)
+			track_sb.modulate_color        = Color(0.40, 0.36, 0.30, 1.0)  # acero oscuro
 			slider.add_theme_stylebox_override("slider", track_sb)
 
-			# Zona rellenada (izquierda del grabber) — más brillante
+			# Zona rellenada (izquierda del grabber) — latón industrial
 			var fill_sb := StyleBoxTexture.new()
 			fill_sb.texture               = tex_track
 			fill_sb.texture_margin_left   = 6
 			fill_sb.texture_margin_right  = 6
 			fill_sb.texture_margin_top    = 6
 			fill_sb.texture_margin_bottom = 6
-			fill_sb.modulate_color        = Color(1.30, 1.20, 0.60, 1.0)  # tono dorado
+			fill_sb.modulate_color        = Color(0.90, 0.72, 0.28, 1.0)  # latón envejecido
 			slider.add_theme_stylebox_override("grabber_area",           fill_sb)
 			slider.add_theme_stylebox_override("grabber_area_highlight", fill_sb)
 
