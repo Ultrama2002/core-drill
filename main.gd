@@ -726,7 +726,7 @@ func _update_ui():
 
 const _TUNNEL_X   := 255.0
 const _TUNNEL_W   := 90.0
-const _CHAR_Y     := 340.0
+const _CHAR_Y     := 400.0
 const _DRILL_FOOT := 20.0
 const _PPM        := 2.0
 
@@ -747,7 +747,7 @@ func _get_drill_name() -> String:
 
 func _play_intro() -> void:
 	_intro_playing = true
-	_intro_depth   = -90.0   # "cielo" — bastante por encima de la superficie
+	_intro_depth   = -250.0  # "cielo" — muy por encima, solo se ve el fondo de cielo
 
 	# HUD y ruler invisibles durante el viaje
 	$UI/HUD.modulate.a     = 0.0
@@ -769,7 +769,7 @@ func _play_intro() -> void:
 	# Fade del overlay + descenso desde el cielo — en paralelo
 	t.tween_property(overlay, "color:a", 0.0, 0.9) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	t.parallel().tween_property(self, "_intro_depth", depth, 2.3) \
+	t.parallel().tween_property(self, "_intro_depth", depth, 4.3) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	# Al llegar al taladro: limpiar overlay y hacer aparecer el HUD
 	t.tween_callback(func():

@@ -31,7 +31,7 @@ script = ExtResource("5_tunnelshaft")
 layer = 2
 
 [node name="DrillChar" type="Node2D" parent="DrillLayer" unique_id=100000002]
-position = Vector2(300, 340)
+position = Vector2(300, 400)
 script = ExtResource("3_drillchar")
 
 [node name="FloatContainer" type="Node2D" parent="." unique_id=100000003]
